@@ -1,0 +1,1 @@
+"""Beanie database documents."""
