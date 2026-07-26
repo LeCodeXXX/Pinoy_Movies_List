@@ -78,8 +78,8 @@ export default function DisplayMovies() {
             key={genre}
             onClick={() => setSelectedGenre(genre)}
             className={`rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all ${selectedGenre === genre
-                ? 'border border-red-500/40 bg-red-600 text-white shadow-md shadow-red-950/40'
-                : 'border border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800/80 hover:text-white'
+              ? 'border border-red-500/40 bg-red-600 text-white shadow-md shadow-red-950/40'
+              : 'border border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800/80 hover:text-white'
               }`}
           >
             {genre}
@@ -116,7 +116,7 @@ export default function DisplayMovies() {
                 >
                   {/* Poster / Header Box */}
                   <div
-                    className={`relative flex h-[230px] w-full shrink-0 flex-col justify-between bg-gradient-to-br ${movie.posterColor} p-3 transition-all duration-300 group-hover:h-full group-hover:w-44`}
+                    className={`relative flex h-[230px] w-full shrink-0 flex-col justify-between bg-gradient-to-br ${movie.posterColor} p-4 transition-all duration-300 group-hover:h-full group-hover:w-44`}
                   >
                     <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.08),transparent)] pointer-events-none" />
 
@@ -142,13 +142,10 @@ export default function DisplayMovies() {
                   </div>
 
                   {/* Content Area - Constant height h-full */}
-                  <div className="flex h-full flex-1 flex-col justify-between p-3 transition-all duration-300 group-hover:p-3.5">
+                  <div className="flex h-full flex-1 flex-col justify-between p-4 transition-all duration-300 group-hover:p-5">
                     {/* Compact Title & Genre (Visible when NOT expanded) */}
                     <div className="group-hover:hidden flex flex-col justify-between h-full">
                       <div>
-                        <h3 className="text-xs font-bold text-white truncate">
-                          {movie.title}
-                        </h3>
                         <div className="mt-1 flex items-center justify-between text-[10px] text-zinc-400">
                           <span>{movie.year}</span>
                           <span>•</span>
