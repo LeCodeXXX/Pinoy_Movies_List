@@ -1,38 +1,70 @@
 'use client'
 
+import Link from 'next/link'
 import React, { useState } from 'react'
 import { moviesData } from '../dummy/moviesData'
+import type { AdvancedSearchFilters } from '../types/movieSearch'
 
-export default function DisplayMovies() {
+interface DisplayMoviesProps {
+  advancedFilters: AdvancedSearchFilters
+  searchQuery: string
+  onClearFilters: () => void
+}
+
+export default function DisplayMovies({
+  advancedFilters,
+  searchQuery,
+  onClearFilters,
+}: DisplayMoviesProps) {
   const [selectedGenre, setSelectedGenre] = useState<string>('All')
-  const [searchQuery, setSearchQuery] = useState<string>('')
-  const [favorites, setFavorites] = useState<Record<string, boolean>>({})
 
   // Extract unique genres dynamically
   const genres = ['All', ...Array.from(new Set(moviesData.map((m) => m.genre)))]
 
-  const toggleFavorite = (id: string) => {
-    setFavorites((prev) => ({ ...prev, [id]: !prev[id] }))
-  }
-
   const filteredMovies = moviesData.filter((movie) => {
+    const movieYear = Number(movie.year)
     const matchesGenre = selectedGenre === 'All' || movie.genre === selectedGenre
+    const matchesAdvancedGenre =
+      advancedFilters.genre === 'all' || movie.genre === advancedFilters.genre
+    const matchesYear =
+      advancedFilters.year === 'all' || movie.year === advancedFilters.year
+    const matchesRating =
+      advancedFilters.minRating === 'all' ||
+      Number(movie.rating) >= Number(advancedFilters.minRating)
+    const matchesReleasePeriod = (() => {
+      switch (advancedFilters.releasePeriod) {
+        case 'before-2000':
+          return movieYear < 2000
+        case '2000s':
+          return movieYear >= 2000 && movieYear <= 2009
+        case '2010s':
+          return movieYear >= 2010 && movieYear <= 2019
+        case '2020s':
+          return movieYear >= 2020
+        default:
+          return true
+      }
+    })()
     const matchesSearch =
       movie.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       movie.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      movie.director.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesGenre && matchesSearch
+      movie.director.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      movie.genre.toLowerCase().includes(searchQuery.toLowerCase())
+    return (
+      matchesGenre &&
+      matchesAdvancedGenre &&
+      matchesYear &&
+      matchesRating &&
+      matchesReleasePeriod &&
+      matchesSearch
+    )
   })
 
   return (
     <div className="mx-auto w-full max-w-[1500px] px-3 py-6 text-zinc-100 sm:px-6">
       {/* Header Section */}
-      <div className="mb-6 flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+      <div className="mb-4 flex items-end justify-between gap-4">
         <div>
-          <div className="inline-flex items-center gap-2 rounded-full border border-red-500/20 bg-red-500/10 px-3.5 py-1 text-xs font-semibold uppercase tracking-widest text-red-400">
-            <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse"></span>
-            Pinoy Cinema Vault
-          </div>
           <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
             Popular Movies
           </h2>
@@ -41,43 +73,18 @@ export default function DisplayMovies() {
           </p>
         </div>
 
-        {/* Search & Stats */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative">
-            <svg
-              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search 18 classic movies..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-xl border border-zinc-800 bg-zinc-900/90 py-2 pl-10 pr-4 text-xs text-white placeholder-zinc-500 transition focus:border-red-500/50 focus:outline-none focus:ring-1 focus:ring-red-500/50 sm:w-64 sm:text-sm"
-            />
-          </div>
-          <span className="inline-flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-xs font-medium text-zinc-400 shadow-sm">
-            {filteredMovies.length} {filteredMovies.length === 1 ? 'movie' : 'movies'}
-          </span>
-        </div>
+        <span className="inline-flex shrink-0 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/80 px-2.5 py-1.5 text-[11px] font-medium text-zinc-400 shadow-sm">
+          {filteredMovies.length} {filteredMovies.length === 1 ? 'movie' : 'movies'}
+        </span>
       </div>
 
-      {/* Genre Filter Pills */}
-      <div className="mb-6 flex flex-wrap gap-1.5">
+      {/* Single-row genre filter */}
+      <div className="mb-4 flex gap-1.5 overflow-x-auto pb-1">
         {genres.map((genre) => (
           <button
             key={genre}
             onClick={() => setSelectedGenre(genre)}
-            className={`rounded-lg px-3.5 py-1.5 text-xs font-medium transition-all ${selectedGenre === genre
+            className={`shrink-0 rounded-lg px-3 py-1 text-[11px] font-medium transition-all ${selectedGenre === genre
               ? 'border border-red-500/40 bg-red-600 text-white shadow-md shadow-red-950/40'
               : 'border border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:bg-zinc-800/80 hover:text-white'
               }`}
@@ -94,7 +101,7 @@ export default function DisplayMovies() {
           <button
             onClick={() => {
               setSelectedGenre('All')
-              setSearchQuery('')
+              onClearFilters()
             }}
             className="mt-4 rounded-lg bg-zinc-800 px-4 py-2 text-xs font-semibold text-white transition hover:bg-zinc-700"
           >
@@ -102,16 +109,31 @@ export default function DisplayMovies() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-6">
           {filteredMovies.map((movie, index) => {
-            // Determine if card is on the right side of the 6-col grid to expand inwards
-            const isRightSide = (index % 6) >= 3
+            const isRightSideTwoColumns = (index % 2) >= 1
+            const isRightSideThreeColumns = (index % 3) >= 2
+            const isRightSideFourColumns = (index % 4) >= 2
+            const isRightSideSixColumns = (index % 6) >= 3
+            const hasDetails =
+              movie.id === 'heneral-luna' || movie.id === 'himala'
 
             return (
               <div key={movie.id} className="group relative h-[320px] w-full">
                 {/* Fixed Height Overlay Card */}
                 <article
-                  className={`absolute top-0 z-10 flex flex-col w-full h-[320px] overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-900 shadow-md backdrop-blur-md transition-all duration-300 ease-out group-hover:z-50 group-hover:w-[370px] group-hover:flex-row group-hover:border-zinc-700 group-hover:shadow-2xl group-hover:shadow-black/95 ${isRightSide ? 'left-0 group-hover:left-auto group-hover:right-0' : 'left-0'
+                  className={`absolute top-0 z-10 flex h-[320px] w-full flex-col overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-900 shadow-md backdrop-blur-md transition-all duration-300 ease-out group-hover:z-50 group-hover:w-[370px] group-hover:flex-row group-hover:border-zinc-700 group-hover:shadow-2xl group-hover:shadow-black/95 ${isRightSideTwoColumns
+                    ? 'left-0 group-hover:left-auto group-hover:right-0'
+                    : 'left-0 group-hover:right-auto'
+                    } ${isRightSideThreeColumns
+                      ? 'sm:group-hover:left-auto sm:group-hover:right-0'
+                      : 'sm:group-hover:left-0 sm:group-hover:right-auto'
+                    } ${isRightSideFourColumns
+                      ? 'md:group-hover:left-auto md:group-hover:right-0'
+                      : 'md:group-hover:left-0 md:group-hover:right-auto'
+                    } ${isRightSideSixColumns
+                      ? '2xl:group-hover:left-auto 2xl:group-hover:right-0'
+                      : '2xl:group-hover:left-0 2xl:group-hover:right-auto'
                     }`}
                 >
                   {/* Poster / Header Box */}
@@ -176,7 +198,7 @@ export default function DisplayMovies() {
                         </p>
 
                         {/* Description */}
-                        <p className="mt-2 text-[11px] leading-relaxed text-zinc-400 line-clamp-4">
+                        <p className="mt-2 text-[11px] text-wrap leading-relaxed text-zinc-400 line-clamp-4">
                           {movie.description}
                         </p>
                       </div>
@@ -187,22 +209,37 @@ export default function DisplayMovies() {
                           <span className="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
                           HD Available
                         </span>
-                        <button className="group/btn inline-flex items-center gap-1 rounded-md border border-red-500/30 bg-red-950/50 px-2.5 py-1 text-[11px] font-semibold text-red-300 transition-all hover:border-red-500 hover:bg-red-600 hover:text-white">
-                          <span>Details</span>
-                          <svg
-                            className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
+                        {hasDetails ? (
+                          <Link
+                            className="group/btn inline-flex items-center gap-1 rounded-md border border-red-500/30 bg-red-950/50 px-2.5 py-1 text-[11px] font-semibold text-red-300 transition-all hover:border-red-500 hover:bg-red-600 hover:text-white"
+                            href={`/movies/${movie.id}`}
                           >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
-                        </button>
+                            <span>Details</span>
+                            <svg
+                              aria-hidden="true"
+                              className="h-3 w-3 transition-transform group-hover/btn:translate-x-0.5"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                d="M9 5l7 7-7 7"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                              />
+                            </svg>
+                          </Link>
+                        ) : (
+                          <button
+                            className="inline-flex cursor-not-allowed items-center gap-1 rounded-md border border-zinc-700 bg-zinc-800/50 px-2.5 py-1 text-[11px] font-semibold text-zinc-600"
+                            disabled
+                            title="Details are currently available for Heneral Luna and Himala"
+                            type="button"
+                          >
+                            Details
+                          </button>
+                        )}
                       </div>
                     </div>
                   </div>
