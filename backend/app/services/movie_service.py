@@ -18,9 +18,13 @@ from app.schemas.movie import (
     TrailerResponse,
     WatchProviderResponse,
 )
+from app.services.content_safety_service import (
+    ContentSafetyService,
+    content_safety_service,
+)
 from app.services.tmdb_client import TmdbClient, tmdb_client
 
-DETAIL_APPENDICES = "credits,videos,watch/providers,similar"
+DETAIL_APPENDICES = "credits,videos,watch/providers,similar,keywords"
 WRITING_JOBS = {"Screenplay", "Story", "Teleplay", "Writer"}
 MAX_CAST_MEMBERS = 20
 MAX_SIMILAR_MOVIES = 12
@@ -29,8 +33,13 @@ TMDB_MAX_PAGES = 500
 
 
 class MovieService:
-    def __init__(self, client: TmdbClient) -> None:
+    def __init__(
+        self,
+        client: TmdbClient,
+        safety_service: ContentSafetyService = content_safety_service,
+    ) -> None:
         self.client = client
+        self.safety_service = safety_service
 
     async def get_movie(
         self,
@@ -46,6 +55,7 @@ class MovieService:
             },
             movie_id=movie_id,
         )
+        self.safety_service.ensure_movie_allowed(data, movie_id)
         return self._build_movie_detail(data, region)
 
     async def discover_philippine_movies(
@@ -64,12 +74,7 @@ class MovieService:
             TMDB_MAX_PAGES,
         )
         if first_tmdb_page > TMDB_MAX_PAGES:
-            return MovieListResponse(
-                page=page,
-                total_pages=TMDB_MAX_PAGES,
-                total_results=0,
-                results=[],
-            )
+            return self._empty_movie_list(page)
 
         pages = await asyncio.gather(
             *(
@@ -85,11 +90,13 @@ class MovieService:
         total_results = pages[0].get("total_results") or 0
         maximum_results = TMDB_PAGE_SIZE * TMDB_MAX_PAGES
         available_results = min(total_results, maximum_results)
-        combined_results = [
-            movie
-            for result_page in pages
-            for movie in result_page.get("results") or []
-        ]
+        combined_results = self.safety_service.filter_movies(
+            [
+                movie
+                for result_page in pages
+                for movie in result_page.get("results") or []
+            ]
+        )
         slice_start = first_result_index % TMDB_PAGE_SIZE
         selected_results = combined_results[slice_start : slice_start + page_size]
 
@@ -98,6 +105,15 @@ class MovieService:
             total_pages=ceil(available_results / page_size) if available_results else 0,
             total_results=total_results,
             results=self._build_summaries(selected_results),
+        )
+
+    @staticmethod
+    def _empty_movie_list(page: int) -> MovieListResponse:
+        return MovieListResponse(
+            page=page,
+            total_pages=TMDB_MAX_PAGES,
+            total_results=0,
+            results=[],
         )
 
     async def _discover_philippine_movie_page(
@@ -112,6 +128,7 @@ class MovieService:
             "language": language,
             "region": settings.tmdb_default_region,
             "with_origin_country": settings.tmdb_default_region,
+            "without_companies": self.safety_service.excluded_company_ids_parameter,
             "include_adult": False,
             "include_video": False,
             "sort_by": sort_by,
@@ -184,11 +201,12 @@ class MovieService:
         )
 
     def _build_movie_list(self, data: dict[str, Any]) -> MovieListResponse:
+        safe_results = self.safety_service.filter_movies(data.get("results") or [])
         return MovieListResponse(
             page=data.get("page") or 1,
             total_pages=data.get("total_pages") or 0,
             total_results=data.get("total_results") or 0,
-            results=self._build_summaries(data.get("results") or []),
+            results=self._build_summaries(safe_results),
         )
 
     def _build_summaries(
@@ -196,7 +214,8 @@ class MovieService:
         movies: list[dict[str, Any]],
         limit: int | None = None,
     ) -> list[MovieSummaryResponse]:
-        selected_movies = movies[:limit] if limit is not None else movies
+        safe_movies = self.safety_service.filter_movies(movies)
+        selected_movies = safe_movies[:limit] if limit is not None else safe_movies
         return [self._build_summary(movie) for movie in selected_movies]
 
     def _build_summary(self, movie: dict[str, Any]) -> MovieSummaryResponse:

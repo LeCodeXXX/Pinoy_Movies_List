@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
+import BackToMovies from '@/app/components/BackToMovies'
 import MovieCard from '@/app/components/MovieCard'
 import type { MovieGenreOption } from '@/app/constants/movieGenres'
 import { getMovies } from '@/app/services/movieApi'
@@ -45,25 +46,13 @@ export default function GenreMovies({ genre, page }: GenreMoviesPageProps) {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <main className="mx-auto w-full max-w-[1600px] px-4 py-6 sm:px-6 lg:px-8">
-        <Link
-          className="group inline-flex items-center gap-3 rounded-xl border border-red-500/50 bg-red-500/10 px-4 py-2.5 text-sm font-bold text-red-200 transition hover:bg-red-600 hover:text-white"
-          href="/"
-        >
-          <span className="text-lg transition-transform group-hover:-translate-x-1">←</span>
-          Back to movies
-        </Link>
+        <BackToMovies />
 
         <header className="mb-7 mt-8 flex flex-wrap items-end justify-between gap-4 border-b border-zinc-800 pb-6">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-red-400">
-              Genre collection
-            </p>
             <h1 className="mt-1 text-4xl font-black tracking-tight text-white sm:text-5xl">
-              {genre.name} Movies
+              <span className="text-red-600">{genre.name}</span> Movies
             </h1>
-            <p className="mt-2 text-sm text-zinc-500">
-              18 Filipino movies per page
-            </p>
           </div>
           {isCurrentPage ? (
             <p className="text-xs text-zinc-500">
@@ -137,11 +126,10 @@ function GenrePagination({
           ) : null}
           <Link
             aria-current={pageNumber === currentPage ? 'page' : undefined}
-            className={`flex h-9 min-w-9 items-center justify-center rounded-lg px-3 text-xs font-bold transition ${
-              pageNumber === currentPage
-                ? 'bg-red-600 text-white'
-                : 'border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white'
-            }`}
+            className={`flex h-9 min-w-9 items-center justify-center rounded-lg px-3 text-xs font-bold transition ${pageNumber === currentPage
+              ? 'bg-red-600 text-white'
+              : 'border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white'
+              }`}
             href={genrePageHref(genreId, pageNumber)}
           >
             {pageNumber}

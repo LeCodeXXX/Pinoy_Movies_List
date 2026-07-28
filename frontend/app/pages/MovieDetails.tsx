@@ -3,12 +3,10 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import BackToMovies from '@/app/components/BackToMovies'
 import MovieReviews from '@/app/components/movie-details/MovieReviews'
-import {
-  getMovieReviews,
-  type MovieReview,
-} from '@/app/dummy/movieReviewsData'
+import { getMovieReviews } from '@/app/dummy/movieReviewsData'
 import { getMovie } from '@/app/services/movieApi'
 import type { MovieDetail } from '@/app/types/movie'
 
@@ -65,18 +63,7 @@ export default function MovieDetails() {
     <div className="min-h-screen bg-zinc-950 text-zinc-100 selection:bg-red-500 selection:text-white">
       <main className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 lg:px-8">
         <nav className="mb-6">
-          <Link
-            className="group inline-flex items-center gap-3 rounded-xl border border-red-500/50 bg-red-500/10 px-4 py-2.5 text-sm font-bold text-red-200 shadow-lg shadow-red-950/20 transition hover:border-red-400 hover:bg-red-600 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-950"
-            href="/"
-          >
-            <span
-              aria-hidden="true"
-              className="text-lg leading-none transition-transform group-hover:-translate-x-1"
-            >
-              ←
-            </span>
-            Back to movies
-          </Link>
+          <BackToMovies />
         </nav>
 
         <MovieHero movie={movie} />
@@ -135,7 +122,7 @@ export default function MovieDetails() {
           </aside>
         </div>
 
-        <RatingDistribution movie={movie} reviews={reviews} />
+        <TmdbRating movie={movie} />
         <MovieReviews reviews={reviews} />
         <SimilarMovies movie={movie} />
       </main>
@@ -254,162 +241,39 @@ function TrailerSection({ movie }: { movie: MovieDetail }) {
   )
 }
 
-function RatingDistribution({
-  movie,
-  reviews,
-}: {
-  movie: MovieDetail
-  reviews: MovieReview[]
-}) {
-  const averageRating = Math.min(10, Math.max(0, movie.tmdb_vote_average))
-  const totalReviewRatings = reviews.length
-  const ratingCounts = Array.from({ length: 10 }, (_, index) => {
-    const rating = index + 1
-    return {
-      count: reviews.filter((review) => Math.round(review.rating) === rating)
-        .length,
-      rating,
-    }
-  })
-  const maximumCount = Math.max(...ratingCounts.map(({ count }) => count), 1)
-
+function TmdbRating({ movie }: { movie: MovieDetail }) {
+  const score = Math.min(10, Math.max(0, movie.tmdb_vote_average))
   return (
-    <section className="mt-6 rounded-2xl border border-emerald-500/15 bg-zinc-900/60 p-5 sm:p-6">
-      <div className="flex items-end justify-between gap-4">
-        <div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400">
-            Local review data
-          </p>
-          <h2 className="mt-1 text-2xl font-extrabold text-white">
-            Rating distribution
-          </h2>
-        </div>
-        <p className="shrink-0 text-right">
-          <span className="text-4xl font-black leading-none text-emerald-400 sm:text-5xl">
-            {averageRating.toFixed(1)}
-          </span>
-          <span className="text-sm font-bold text-zinc-500"> / 10</span>
-          <span className="mt-1 block text-[10px] font-semibold uppercase tracking-wider text-zinc-600">
-            Average rating
-          </span>
-        </p>
+    <section className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 sm:p-6">
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400">Audience score</p>
+      <div className="mt-1 flex items-end justify-between gap-4">
+        <h2 className="text-2xl font-extrabold text-white">Rating</h2>
+        <p><span className="text-3xl font-black text-white">{score.toFixed(1)}</span><span className="text-sm text-zinc-500"> / 10</span></p>
       </div>
-
-      {totalReviewRatings > 0 ? (
-        <div
-          aria-label="Vertical review rating distribution from 1 to 10"
-          className="mt-7 grid h-64 grid-cols-10 items-end gap-1 border-b border-zinc-700"
-          role="img"
-        >
-          {ratingCounts.map(({ count, rating }) => {
-            const percentage = (count / totalReviewRatings) * 100
-            const chartHeight = (count / maximumCount) * 100
-
-            return (
-              <div className="flex h-full flex-col items-center justify-end" key={rating}>
-                <span className="mb-2 text-[9px] tabular-nums text-zinc-500 sm:text-[10px]">
-                  {percentage.toFixed(0)}%
-                </span>
-                <div className="flex h-48 w-full items-end overflow-hidden rounded-t-sm bg-zinc-800/80">
-                  <div
-                    className="w-full rounded-t-sm bg-emerald-500 shadow-[0_-4px_16px_rgba(16,185,129,0.25)]"
-                    style={{ height: `${chartHeight}%` }}
-                  />
-                </div>
-                <span className="mt-2 text-[10px] font-bold text-zinc-400">
-                  {rating}
-                </span>
-              </div>
-            )
-          })}
-        </div>
-      ) : (
-        <div className="mt-6 rounded-xl border border-dashed border-zinc-800 p-8 text-center text-sm text-zinc-500">
-          No local review ratings are available for this distribution.
-        </div>
-      )}
-
-      <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-xs text-zinc-500">
-        <span>Distribution based on {totalReviewRatings} local reviews</span>
-        <span className="font-semibold text-zinc-400">
-          {movie.tmdb_vote_count.toLocaleString()} people rated this movie
-        </span>
+      <div className="relative mt-6 h-5 overflow-hidden rounded-full bg-zinc-800">
+        <div className={`h-full rounded-full ${score >= 5 ? 'bg-emerald-500' : 'bg-red-500'}`} style={{ width: `${score * 10}%` }} />
+        <div className="absolute bottom-0 left-1/2 top-0 w-0.5 bg-red-400" title="5/10 midpoint" />
       </div>
+      <div className="mt-2 flex justify-between text-[10px] text-zinc-600"><span>0</span><span className="text-red-400">5 midpoint</span><span>10</span></div>
+      <p className="mt-4 text-xs text-zinc-500">Based on {movie.tmdb_vote_count.toLocaleString()} audience votes.</p>
     </section>
   )
 }
 
 function SimilarMovies({ movie }: { movie: MovieDetail }) {
-  const rowRef = useRef<HTMLDivElement>(null)
-
-  const scrollMovies = (direction: -1 | 1) => {
-    const row = rowRef.current
-    if (!row) return
-
-    const firstCard = row.querySelector<HTMLElement>('[data-similar-card]')
-    const gap = Number.parseFloat(window.getComputedStyle(row).columnGap) || 12
-    const distance = (firstCard?.offsetWidth ?? 112) + gap
-
-    row.scrollBy({ behavior: 'smooth', left: direction * distance })
-  }
-
   if (!movie.similar_movies.length) return null
-
   return (
-    <section className="mt-12 border-t border-zinc-800 pb-10 pt-10">
+    <section className="pb-10 pt-2">
       <h2 className="text-xl font-extrabold text-white">Similar movies</h2>
-      <div className="relative mt-5 px-6">
-        <div
-          className="scrollbar-hidden flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2"
-          ref={rowRef}
-        >
-          {movie.similar_movies.map((similar) => (
-            <Link
-              className="w-28 shrink-0 snap-start"
-              data-similar-card
-              href={`/movies/${similar.id}`}
-              key={similar.id}
-            >
-              <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-zinc-800">
-                {similar.poster_url ? (
-                  <Image
-                    alt={`${similar.title} poster`}
-                    className="object-cover"
-                    fill
-                    sizes="112px"
-                    src={similar.poster_url}
-                  />
-                ) : null}
-              </div>
-              <p className="mt-2 line-clamp-2 text-xs font-bold text-zinc-300">
-                {similar.title}
-              </p>
-            </Link>
-          ))}
-        </div>
-
-        <button
-          aria-label="Show previous similar movie"
-          className="absolute left-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-zinc-950/95 text-white shadow-xl shadow-black/60 transition hover:scale-110 hover:border-red-400 hover:bg-red-600 disabled:opacity-30"
-          disabled={movie.similar_movies.length <= 1}
-          onClick={() => scrollMovies(-1)}
-          type="button"
-        >
-          <svg aria-hidden="true" className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} />
-          </svg>
-        </button>
-        <button
-          aria-label="Show next similar movie"
-          className="absolute right-0 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-white/15 bg-zinc-950/95 text-white shadow-xl shadow-black/60 transition hover:scale-110 hover:border-red-400 hover:bg-red-600 disabled:opacity-30"
-          disabled={movie.similar_movies.length <= 1}
-          onClick={() => scrollMovies(1)}
-          type="button"
-        >
-          <svg aria-hidden="true" className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} />
-          </svg>
-        </button>
+      <div className="mt-4 flex gap-3 overflow-x-auto pb-2">
+        {movie.similar_movies.map((similar) => (
+          <Link key={similar.id} className="w-28 shrink-0" href={`/movies/${similar.id}`}>
+            <div className="relative aspect-[2/3] overflow-hidden rounded-xl bg-zinc-800">
+              {similar.poster_url ? <Image alt="" className="object-cover" fill sizes="112px" src={similar.poster_url} /> : null}
+            </div>
+            <p className="mt-2 line-clamp-2 text-xs font-bold text-zinc-300">{similar.title}</p>
+          </Link>
+        ))}
       </div>
     </section>
   )
@@ -428,7 +292,7 @@ function MovieDetailsSkeleton() {
 }
 
 function MovieDetailsError({ message }: { message: string | null }) {
-  return <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-6 text-center"><div><h1 className="text-2xl font-black text-white">Movie unavailable</h1><p className="mt-2 text-sm text-zinc-500">{message ?? 'The movie could not be loaded.'}</p><Link className="mt-5 inline-block rounded-xl bg-red-600 px-4 py-2 text-xs font-bold text-white" href="/">Back to movies</Link></div></div>
+  return <div className="flex min-h-screen items-center justify-center bg-zinc-950 p-6 text-center"><div><h1 className="text-2xl font-black text-white">Movie unavailable</h1><p className="mt-2 text-sm text-zinc-500">{message ?? 'The movie could not be loaded.'}</p><BackToMovies className="mt-5" /></div></div>
 }
 
 function formatRuntime(runtime: number | null) {

@@ -61,7 +61,7 @@ export default function Main() {
           try {
             const response = await getMovies({
               genreId: genre.id,
-              pageSize: 18,
+              pageSize: 30,
               signal: controller.signal,
             })
             return { error: null, genre, movies: response.results }
@@ -93,7 +93,7 @@ export default function Main() {
         setRankingError(message)
       }
 
-      setGenreSections(loadedGenreSections)
+      setGenreSections(deduplicateGenreSections(loadedGenreSections))
       setIsLoading(false)
       setAreGenresLoading(false)
     }
@@ -190,4 +190,23 @@ export default function Main() {
 
 function getErrorMessage(error: unknown) {
   return error instanceof Error ? error.message : 'An unexpected error occurred.'
+}
+
+function deduplicateGenreSections(sections: GenreSectionData[]) {
+  const displayedMovieIds = new Set<number>()
+
+  return sections.map((section) => {
+    if (section.error) return section
+
+    const movies = section.movies
+      .filter(
+        (movie) =>
+          movie.genre_ids.includes(section.genre.id) &&
+          !displayedMovieIds.has(movie.id),
+      )
+      .slice(0, 18)
+
+    movies.forEach((movie) => displayedMovieIds.add(movie.id))
+    return { ...section, movies }
+  })
 }

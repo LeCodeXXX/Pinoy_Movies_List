@@ -115,6 +115,7 @@ class MovieServiceTests(IsolatedAsyncioTestCase):
 
         self.assertEqual(client.path, "/discover/movie")
         self.assertEqual(client.params["with_origin_country"], "PH")
+        self.assertEqual(client.params["without_companies"], "149142")
         self.assertFalse(client.params["include_adult"])
         self.assertEqual(movies.results[0].id, 42)
 
@@ -150,6 +151,32 @@ class MovieServiceTests(IsolatedAsyncioTestCase):
         self.assertEqual(client.params["with_genres"], 10749)
         self.assertEqual(len(movies.results), 6)
         self.assertEqual(movies.total_pages, 4)
+
+    async def test_search_removes_adult_and_explicit_results(self) -> None:
+        safe_movie = {
+            "id": 1,
+            "title": "Family Story",
+            "original_title": "Family Story",
+            "original_language": "tl",
+            "overview": "A family rebuilds their life together.",
+        }
+        client = FakeTmdbClient(
+            {
+                "page": 1,
+                "total_pages": 1,
+                "total_results": 3,
+                "results": [
+                    safe_movie,
+                    {**safe_movie, "id": 2, "adult": True},
+                    {**safe_movie, "id": 3, "title": "A Softcore Story"},
+                ],
+            }
+        )
+        service = MovieService(client)  # type: ignore[arg-type]
+
+        movies = await service.search_movies("story", 1, "en-US")
+
+        self.assertEqual([movie.id for movie in movies.results], [1])
 
 
 if __name__ == "__main__":

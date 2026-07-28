@@ -62,14 +62,22 @@ function GenreRow({
   return (
     <section aria-labelledby={`genre-${section.genre.id}`}>
       <div className="mb-6 flex items-center justify-between gap-4">
-        <div className="min-w-0 flex-1">
-          <div className="w-full max-w-2xl rounded-l-md bg-gradient-to-r from-red-700 via-red-950/70 to-transparent px-5 py-3 sm:px-6">
+        <div className="group/label flex min-w-0 flex-1 items-center gap-4">
+          <span
+            aria-hidden="true"
+            className="h-11 w-1.5 shrink-0 rounded-full bg-red-600 shadow-[0_0_18px_rgba(220,38,38,0.45)]"
+          />
+          <div className="min-w-0">
             <h3
-              className="text-3xl font-black uppercase tracking-tight text-white sm:text-2xl"
+              className="truncate text-2xl font-black tracking-tight text-white sm:text-3xl"
               id={`genre-${section.genre.id}`}
             >
               {section.genre.name}
             </h3>
+            <span
+              aria-hidden="true"
+              className="mt-2 block h-0.5 w-12 rounded-full bg-red-600 transition-all duration-300 group-hover/label:w-24"
+            />
           </div>
         </div>
 
