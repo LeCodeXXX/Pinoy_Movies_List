@@ -11,6 +11,8 @@ interface MovieCardProps {
 export default function MovieCard({ className = '', movie }: MovieCardProps) {
   const year = movie.release_date?.slice(0, 4) ?? 'TBA'
   const genre = getMovieGenreNames(movie.genre_ids)[0] ?? 'Film'
+  const hasRating = movie.tmdb_vote_count > 0 && movie.tmdb_vote_average > 0
+  const rating = hasRating ? movie.tmdb_vote_average.toFixed(1) : 'N/A'
 
   return (
     <article
@@ -18,7 +20,7 @@ export default function MovieCard({ className = '', movie }: MovieCardProps) {
     >
       <Link
         aria-label={`View details for ${movie.title}`}
-        className="relative block aspect-[2/3] overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-950"
+        className="relative block aspect-[2/3] overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-950 focus:outline-none"
         href={`/movies/${movie.id}`}
       >
         {movie.poster_url ? (
@@ -35,12 +37,6 @@ export default function MovieCard({ className = '', movie }: MovieCardProps) {
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-transparent to-black/20" />
-        <span className="absolute left-2 top-2 inline-flex items-center gap-1 rounded-md border border-emerald-500/20 bg-black/70 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400 backdrop-blur-md">
-          <svg aria-hidden="true" className="h-2.5 w-2.5 fill-current" viewBox="0 0 20 20">
-            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-          </svg>
-          {movie.tmdb_vote_average.toFixed(1)}
-        </span>
         <div className="absolute inset-x-0 bottom-0 p-3">
           <p className="text-[9px] font-semibold uppercase tracking-wider text-white/60">
             {genre}
@@ -48,6 +44,23 @@ export default function MovieCard({ className = '', movie }: MovieCardProps) {
           <h3 className="mt-0.5 line-clamp-2 text-sm font-extrabold leading-tight text-white">
             {movie.title}
           </h3>
+        </div>
+
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/60 px-4 text-center opacity-0 backdrop-blur-[1px] transition duration-300 group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none">
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
+            Rating
+          </p>
+          <div className="mt-1 flex items-end justify-center gap-1 text-white">
+            <span className="text-4xl font-black leading-none tracking-tight sm:text-5xl">
+              {rating}
+            </span>
+            {hasRating ? (
+              <span className="pb-1 text-xs font-bold text-zinc-400">/10</span>
+            ) : null}
+          </div>
+          <span className="mt-6 inline-flex min-h-10 items-center justify-center rounded-lg bg-red-600 px-5 text-xs font-extrabold uppercase tracking-wider text-white shadow-lg shadow-red-950/40 transition group-hover:bg-red-500 group-focus-within:bg-red-500">
+            Details
+          </span>
         </div>
       </Link>
 
