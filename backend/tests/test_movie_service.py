@@ -118,6 +118,39 @@ class MovieServiceTests(IsolatedAsyncioTestCase):
         self.assertFalse(client.params["include_adult"])
         self.assertEqual(movies.results[0].id, 42)
 
+    async def test_discover_supports_genre_and_custom_page_size(self) -> None:
+        client = FakeTmdbClient(
+            {
+                "page": 1,
+                "total_pages": 2,
+                "total_results": 24,
+                "results": [
+                    {
+                        "id": movie_id,
+                        "title": f"Movie {movie_id}",
+                        "original_title": f"Movie {movie_id}",
+                        "original_language": "tl",
+                        "overview": "",
+                        "genre_ids": [10749],
+                    }
+                    for movie_id in range(1, 21)
+                ],
+            }
+        )
+        service = MovieService(client)  # type: ignore[arg-type]
+
+        movies = await service.discover_philippine_movies(
+            1,
+            "en-US",
+            "popularity.desc",
+            genre_id=10749,
+            page_size=6,
+        )
+
+        self.assertEqual(client.params["with_genres"], 10749)
+        self.assertEqual(len(movies.results), 6)
+        self.assertEqual(movies.total_pages, 4)
+
 
 if __name__ == "__main__":
     import unittest

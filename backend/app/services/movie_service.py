@@ -1,5 +1,7 @@
 """Retrieve and normalize movie metadata from TMDB."""
 
+import asyncio
+from math import ceil
 from typing import Any
 
 from app.core.config import settings
@@ -22,6 +24,8 @@ DETAIL_APPENDICES = "credits,videos,watch/providers,similar"
 WRITING_JOBS = {"Screenplay", "Story", "Teleplay", "Writer"}
 MAX_CAST_MEMBERS = 20
 MAX_SIMILAR_MOVIES = 12
+TMDB_PAGE_SIZE = 20
+TMDB_MAX_PAGES = 500
 
 
 class MovieService:
@@ -49,20 +53,76 @@ class MovieService:
         page: int,
         language: str,
         sort_by: str,
+        genre_id: int | None = None,
+        page_size: int = TMDB_PAGE_SIZE,
     ) -> MovieListResponse:
-        data = await self.client.get(
-            "/discover/movie",
-            params={
-                "page": page,
-                "language": language,
-                "region": settings.tmdb_default_region,
-                "with_origin_country": settings.tmdb_default_region,
-                "include_adult": False,
-                "include_video": False,
-                "sort_by": sort_by,
-            },
+        first_result_index = (page - 1) * page_size
+        first_tmdb_page = first_result_index // TMDB_PAGE_SIZE + 1
+        last_result_index = first_result_index + page_size - 1
+        last_tmdb_page = min(
+            last_result_index // TMDB_PAGE_SIZE + 1,
+            TMDB_MAX_PAGES,
         )
-        return self._build_movie_list(data)
+        if first_tmdb_page > TMDB_MAX_PAGES:
+            return MovieListResponse(
+                page=page,
+                total_pages=TMDB_MAX_PAGES,
+                total_results=0,
+                results=[],
+            )
+
+        pages = await asyncio.gather(
+            *(
+                self._discover_philippine_movie_page(
+                    tmdb_page,
+                    language,
+                    sort_by,
+                    genre_id,
+                )
+                for tmdb_page in range(first_tmdb_page, last_tmdb_page + 1)
+            )
+        )
+        total_results = pages[0].get("total_results") or 0
+        maximum_results = TMDB_PAGE_SIZE * TMDB_MAX_PAGES
+        available_results = min(total_results, maximum_results)
+        combined_results = [
+            movie
+            for result_page in pages
+            for movie in result_page.get("results") or []
+        ]
+        slice_start = first_result_index % TMDB_PAGE_SIZE
+        selected_results = combined_results[slice_start : slice_start + page_size]
+
+        return MovieListResponse(
+            page=page,
+            total_pages=ceil(available_results / page_size) if available_results else 0,
+            total_results=total_results,
+            results=self._build_summaries(selected_results),
+        )
+
+    async def _discover_philippine_movie_page(
+        self,
+        page: int,
+        language: str,
+        sort_by: str,
+        genre_id: int | None,
+    ) -> dict[str, Any]:
+        params: dict[str, str | int | bool] = {
+            "page": page,
+            "language": language,
+            "region": settings.tmdb_default_region,
+            "with_origin_country": settings.tmdb_default_region,
+            "include_adult": False,
+            "include_video": False,
+            "sort_by": sort_by,
+        }
+        if genre_id is not None:
+            params["with_genres"] = genre_id
+
+        return await self.client.get(
+            "/discover/movie",
+            params=params,
+        )
 
     async def search_movies(
         self,

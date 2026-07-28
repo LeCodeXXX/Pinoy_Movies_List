@@ -14,6 +14,8 @@ router = APIRouter(prefix="/movies", tags=["movies"])
 @router.get("", response_model=MovieListResponse)
 async def discover_movies(
     page: Annotated[int, Query(ge=1, le=500)] = 1,
+    page_size: Annotated[int, Query(ge=1, le=100)] = 20,
+    genre_id: Annotated[int | None, Query(ge=1)] = None,
     language: Annotated[str, Query(min_length=2, max_length=10)] = settings.tmdb_default_language,
     sort_by: Literal[
         "popularity.desc",
@@ -23,7 +25,13 @@ async def discover_movies(
         "vote_count.desc",
     ] = "popularity.desc",
 ) -> MovieListResponse:
-    return await movie_service.discover_philippine_movies(page, language, sort_by)
+    return await movie_service.discover_philippine_movies(
+        page,
+        language,
+        sort_by,
+        genre_id=genre_id,
+        page_size=page_size,
+    )
 
 
 @router.get("/search", response_model=MovieListResponse)

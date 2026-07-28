@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { moviesData } from '../dummy/moviesData'
 import {
   defaultAdvancedSearchFilters,
   type AdvancedSearchFilters,
@@ -9,24 +8,20 @@ import {
 
 interface SearchMoviesProps {
   query: string
+  availableGenres: string[]
+  availableYears: string[]
   filters: AdvancedSearchFilters
   onFiltersChange: (filters: AdvancedSearchFilters) => void
   onQueryChange: (query: string) => void
 }
-
-const years = Array.from(new Set(moviesData.map((movie) => movie.year))).sort(
-  (first, second) => Number(second) - Number(first),
-)
-
-const genres = Array.from(
-  new Set(moviesData.map((movie) => movie.genre)),
-).sort()
 
 const selectClassName =
   'w-full appearance-none rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 pr-8 text-xs text-zinc-200 outline-none transition focus:border-red-500/50 focus:ring-1 focus:ring-red-500/40'
 
 export default function SearchMovies({
   query,
+  availableGenres,
+  availableYears,
   filters,
   onFiltersChange,
   onQueryChange,
@@ -44,9 +39,9 @@ export default function SearchMovies({
   }
 
   return (
-    <header className="relative z-[100] rounded-lg border border-zinc-800/90 bg-zinc-900/95 shadow-xl shadow-black/20 backdrop-blur-md">
-      <div className="flex flex-col gap-3 p-3 sm:p-4 lg:flex-row lg:items-center">
-        <div className="min-w-0 lg:w-56 lg:shrink-0">
+    <header className="sticky top-0 z-[100] w-full border-b border-zinc-800/90 bg-zinc-900/95 shadow-xl shadow-black/30 backdrop-blur-md">
+      <div className="mx-auto flex w-full max-w-[1600px] flex-wrap items-center gap-3 px-4 py-3 sm:px-6 lg:flex-nowrap lg:px-8">
+        <div className="min-w-0 flex-1 lg:w-56 lg:flex-none lg:shrink-0">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">
             Pinoy Cinema Vault
           </p>
@@ -55,7 +50,7 @@ export default function SearchMovies({
           </h1>
         </div>
 
-        <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row">
+        <div className="order-3 flex w-full min-w-0 flex-col gap-2 sm:flex-row lg:order-none lg:flex-1">
           <div className="relative min-w-0 flex-1">
             <svg
               aria-hidden="true"
@@ -148,6 +143,8 @@ export default function SearchMovies({
             </svg>
           </button>
         </div>
+
+        <UserProfileArea />
       </div>
 
       {isAdvancedOpen && (
@@ -221,7 +218,7 @@ export default function SearchMovies({
                   value={filters.year}
                 >
                   <option value="all">Any year</option>
-                  {years.map((year) => (
+                  {availableYears.map((year) => (
                     <option key={year} value={year}>
                       {year}
                     </option>
@@ -240,7 +237,7 @@ export default function SearchMovies({
                   value={filters.genre}
                 >
                   <option value="all">All genres</option>
-                  {genres.map((genre) => (
+                  {availableGenres.map((genre) => (
                     <option key={genre} value={genre}>
                       {genre}
                     </option>
@@ -272,5 +269,35 @@ function SelectArrow() {
         strokeWidth={2}
       />
     </svg>
+  )
+}
+
+function UserProfileArea() {
+  return (
+    <div
+      aria-label="User profile area"
+      className="order-2 ml-auto flex shrink-0 items-center gap-3 border-l border-zinc-800 pl-3 lg:order-none lg:ml-0"
+    >
+      <div className="hidden text-right sm:block">
+        <p className="text-xs font-bold text-zinc-200">Profile</p>
+        <p className="mt-0.5 text-[10px] text-zinc-500">User account</p>
+      </div>
+      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-zinc-400 shadow-inner">
+        <svg
+          aria-hidden="true"
+          className="h-5 w-5"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M20 21a8 8 0 00-16 0m8-10a4 4 0 100-8 4 4 0 000 8z"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={1.8}
+          />
+        </svg>
+      </div>
+    </div>
   )
 }
