@@ -60,8 +60,8 @@ export default function DisplayMovies({
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-6">
-          {filteredMovies.map((movie) => (
-            <MovieCard key={movie.id} movie={movie} />
+          {filteredMovies.map((movie, index) => (
+            <MovieCard eager={index === 0} key={movie.id} movie={movie} />
           ))}
         </div>
       )}

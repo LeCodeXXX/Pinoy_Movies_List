@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import AuthMenu from './AuthMenu'
 import {
   defaultAdvancedSearchFilters,
   type AdvancedSearchFilters,
@@ -144,7 +145,7 @@ export default function SearchMovies({
           </button>
         </div>
 
-        <UserProfileArea />
+        <AuthMenu />
       </div>
 
       {isAdvancedOpen && (
@@ -269,35 +270,5 @@ function SelectArrow() {
         strokeWidth={2}
       />
     </svg>
-  )
-}
-
-function UserProfileArea() {
-  return (
-    <div
-      aria-label="User profile area"
-      className="order-2 ml-auto flex shrink-0 items-center gap-3 border-l border-zinc-800 pl-3 lg:order-none lg:ml-0"
-    >
-      <div className="hidden text-right sm:block">
-        <p className="text-xs font-bold text-zinc-200">Profile</p>
-        <p className="mt-0.5 text-[10px] text-zinc-500">User account</p>
-      </div>
-      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-zinc-700 bg-zinc-800 text-zinc-400 shadow-inner">
-        <svg
-          aria-hidden="true"
-          className="h-5 w-5"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            d="M20 21a8 8 0 00-16 0m8-10a4 4 0 100-8 4 4 0 000 8z"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={1.8}
-          />
-        </svg>
-      </div>
-    </div>
   )
 }

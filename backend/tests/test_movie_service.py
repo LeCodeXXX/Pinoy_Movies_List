@@ -152,6 +152,35 @@ class MovieServiceTests(IsolatedAsyncioTestCase):
         self.assertEqual(len(movies.results), 6)
         self.assertEqual(movies.total_pages, 4)
 
+    async def test_discover_removes_movies_repeated_across_tmdb_pages(self) -> None:
+        client = FakeTmdbClient(
+            {
+                "page": 1,
+                "total_pages": 2,
+                "total_results": 40,
+                "results": [
+                    {
+                        "id": movie_id,
+                        "title": f"Movie {movie_id}",
+                        "original_title": f"Movie {movie_id}",
+                        "original_language": "tl",
+                        "overview": "",
+                    }
+                    for movie_id in range(1, 21)
+                ],
+            }
+        )
+        service = MovieService(client)  # type: ignore[arg-type]
+
+        movies = await service.discover_philippine_movies(
+            1,
+            "en-US",
+            "popularity.desc",
+            page_size=30,
+        )
+
+        self.assertEqual([movie.id for movie in movies.results], list(range(1, 21)))
+
     async def test_search_removes_adult_and_explicit_results(self) -> None:
         safe_movie = {
             "id": 1,

@@ -5,10 +5,15 @@ import type { MovieSummary } from '@/app/types/movie'
 
 interface MovieCardProps {
   className?: string
+  eager?: boolean
   movie: MovieSummary
 }
 
-export default function MovieCard({ className = '', movie }: MovieCardProps) {
+export default function MovieCard({
+  className = '',
+  eager = false,
+  movie,
+}: MovieCardProps) {
   const year = movie.release_date?.slice(0, 4) ?? 'TBA'
   const genre = getMovieGenreNames(movie.genre_ids)[0] ?? 'Film'
   const hasRating = movie.tmdb_vote_count > 0 && movie.tmdb_vote_average > 0
@@ -28,6 +33,7 @@ export default function MovieCard({ className = '', movie }: MovieCardProps) {
             alt={`${movie.title} poster`}
             className="object-cover transition duration-500 group-hover:scale-105"
             fill
+            loading={eager ? 'eager' : 'lazy'}
             sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1280px) 25vw, 16vw"
             src={movie.poster_url}
           />

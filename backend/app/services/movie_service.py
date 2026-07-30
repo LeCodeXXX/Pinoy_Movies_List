@@ -90,12 +90,14 @@ class MovieService:
         total_results = pages[0].get("total_results") or 0
         maximum_results = TMDB_PAGE_SIZE * TMDB_MAX_PAGES
         available_results = min(total_results, maximum_results)
-        combined_results = self.safety_service.filter_movies(
-            [
-                movie
-                for result_page in pages
-                for movie in result_page.get("results") or []
-            ]
+        combined_results = self._deduplicate_movies(
+            self.safety_service.filter_movies(
+                [
+                    movie
+                    for result_page in pages
+                    for movie in result_page.get("results") or []
+                ]
+            )
         )
         slice_start = first_result_index % TMDB_PAGE_SIZE
         selected_results = combined_results[slice_start : slice_start + page_size]
@@ -214,9 +216,24 @@ class MovieService:
         movies: list[dict[str, Any]],
         limit: int | None = None,
     ) -> list[MovieSummaryResponse]:
-        safe_movies = self.safety_service.filter_movies(movies)
+        safe_movies = self._deduplicate_movies(
+            self.safety_service.filter_movies(movies)
+        )
         selected_movies = safe_movies[:limit] if limit is not None else safe_movies
         return [self._build_summary(movie) for movie in selected_movies]
+
+    @staticmethod
+    def _deduplicate_movies(movies: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        """Keep the first occurrence when shifting TMDB pages overlap."""
+        unique_movies: list[dict[str, Any]] = []
+        seen_ids: set[int] = set()
+        for movie in movies:
+            movie_id = movie.get("id")
+            if not isinstance(movie_id, int) or movie_id in seen_ids:
+                continue
+            seen_ids.add(movie_id)
+            unique_movies.append(movie)
+        return unique_movies
 
     def _build_summary(self, movie: dict[str, Any]) -> MovieSummaryResponse:
         return MovieSummaryResponse(

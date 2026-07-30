@@ -43,7 +43,7 @@ export async function getMovies({
   if (genreId) params.set('genre_id', String(genreId))
 
   const response = await api(`/api/movies?${params}`, 'GET', { signal })
-  return parseResponse<MovieListResponse>(response)
+  return deduplicateMovieList(await parseResponse<MovieListResponse>(response))
 }
 
 export async function searchMovies(query: string, signal?: AbortSignal) {
@@ -53,7 +53,7 @@ export async function searchMovies(query: string, signal?: AbortSignal) {
     language: 'en-US',
   })
   const response = await api(`/api/movies/search?${params}`, 'GET', { signal })
-  return parseResponse<MovieListResponse>(response)
+  return deduplicateMovieList(await parseResponse<MovieListResponse>(response))
 }
 
 export async function getMovie(movieId: number, signal?: AbortSignal) {
@@ -62,5 +62,25 @@ export async function getMovie(movieId: number, signal?: AbortSignal) {
     'GET',
     { signal },
   )
-  return parseResponse<MovieDetail>(response)
+  const movie = await parseResponse<MovieDetail>(response)
+  return {
+    ...movie,
+    similar_movies: uniqueMoviesById(movie.similar_movies),
+  }
+}
+
+function deduplicateMovieList(response: MovieListResponse): MovieListResponse {
+  return {
+    ...response,
+    results: uniqueMoviesById(response.results),
+  }
+}
+
+function uniqueMoviesById<Movie extends { id: number }>(movies: Movie[]) {
+  const seenIds = new Set<number>()
+  return movies.filter((movie) => {
+    if (seenIds.has(movie.id)) return false
+    seenIds.add(movie.id)
+    return true
+  })
 }

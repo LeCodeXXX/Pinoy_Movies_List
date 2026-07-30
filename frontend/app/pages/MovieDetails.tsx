@@ -6,13 +6,23 @@ import { useParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import BackToMovies from '@/app/components/BackToMovies'
 import MovieReviews from '@/app/components/movie-details/MovieReviews'
+import MoviePreferenceModal from '@/app/components/movie-preferences/MoviePreferenceModal'
 import { getMovieReviews } from '@/app/dummy/movieReviewsData'
 import { getMovie } from '@/app/services/movieApi'
+import { getMoviePreference } from '@/app/services/moviePreferenceApi'
+import type { AuthUser } from '@/app/types/auth'
 import type { MovieDetail } from '@/app/types/movie'
+import type { MoviePreference } from '@/app/types/moviePreference'
+
+const AUTH_USER_STORAGE_KEY = 'pinoy-cinema-auth-user'
 
 export default function MovieDetails() {
   const params = useParams<{ id: string }>()
   const [movie, setMovie] = useState<MovieDetail | null>(null)
+  const [user, setUser] = useState<AuthUser | null>(null)
+  const [preference, setPreference] = useState<MoviePreference | null>(null)
+  const [isListModalOpen, setIsListModalOpen] = useState(false)
+  const [listMessage, setListMessage] = useState<string | null>(null)
   const [requestError, setRequestError] = useState<{
     movieId: number
     message: string
@@ -43,6 +53,33 @@ export default function MovieDetails() {
     return () => controller.abort()
   }, [isValidMovieId, movieId])
 
+  useEffect(() => {
+    if (!isValidMovieId) return
+    const controller = new AbortController()
+    const storedUser = window.localStorage.getItem(AUTH_USER_STORAGE_KEY)
+    if (!storedUser) return
+
+    let parsedUser: AuthUser
+    try {
+      parsedUser = JSON.parse(storedUser) as AuthUser
+      void Promise.resolve().then(() => {
+        if (!controller.signal.aborted) setUser(parsedUser)
+      })
+    } catch {
+      window.localStorage.removeItem(AUTH_USER_STORAGE_KEY)
+      return
+    }
+
+    getMoviePreference(parsedUser.id, movieId, controller.signal)
+      .then(setPreference)
+      .catch((error: unknown) => {
+        if (!controller.signal.aborted) {
+          console.error('Failed to load movie preference', error)
+        }
+      })
+    return () => controller.abort()
+  }, [isValidMovieId, movieId])
+
   if (!isValidMovieId) {
     return <MovieDetailsError message="This movie ID is invalid." />
   }
@@ -50,6 +87,9 @@ export default function MovieDetails() {
     return <MovieDetailsError message={requestError.message} />
   }
   if (movie?.id !== movieId) return <MovieDetailsSkeleton />
+
+  const currentPreference =
+    preference?.movie_id === movieId ? preference : null
 
   const reviews = getMovieReviews(movie.id)
   const releaseDate = movie.release_date
@@ -66,7 +106,19 @@ export default function MovieDetails() {
           <BackToMovies />
         </nav>
 
-        <MovieHero movie={movie} />
+        <MovieHero
+          hasPreference={currentPreference !== null}
+          listMessage={listMessage}
+          movie={movie}
+          onEditList={() => {
+            if (!user) {
+              setListMessage('Sign in first to save movies to your list.')
+              return
+            }
+            setListMessage(null)
+            setIsListModalOpen(true)
+          }}
+        />
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-6">
@@ -126,11 +178,35 @@ export default function MovieDetails() {
         <MovieReviews reviews={reviews} />
         <SimilarMovies movie={movie} />
       </main>
+
+      {user && isListModalOpen ? (
+        <MoviePreferenceModal
+          existingPreference={currentPreference}
+          isOpen
+          movie={movie}
+          onClose={() => setIsListModalOpen(false)}
+          onSaved={(savedPreference) => {
+            setPreference(savedPreference)
+            setListMessage('Your movie list has been updated.')
+          }}
+          userId={user.id}
+        />
+      ) : null}
     </div>
   )
 }
 
-function MovieHero({ movie }: { movie: MovieDetail }) {
+function MovieHero({
+  hasPreference,
+  listMessage,
+  movie,
+  onEditList,
+}: {
+  hasPreference: boolean
+  listMessage: string | null
+  movie: MovieDetail
+  onEditList: () => void
+}) {
   return (
     <section className="relative overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900 shadow-2xl shadow-black/40">
       {movie.backdrop_url ? (
@@ -158,6 +234,20 @@ function MovieHero({ movie }: { movie: MovieDetail }) {
             <span className="text-xl">★</span>
             <span className="text-2xl font-black">{movie.tmdb_vote_average.toFixed(1)}</span>
             <span className="text-xs text-zinc-500">/ 10 · {movie.tmdb_vote_count.toLocaleString()} votes</span>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center gap-3">
+            <button
+              className="rounded-xl bg-blue-600 px-5 py-3 text-xs font-extrabold text-white shadow-lg shadow-blue-950/30 transition hover:bg-blue-500"
+              onClick={onEditList}
+              type="button"
+            >
+              {hasPreference ? 'Edit List Entry' : 'Add to List'}
+            </button>
+            {listMessage ? (
+              <p className="text-xs font-medium text-zinc-400" role="status">
+                {listMessage}
+              </p>
+            ) : null}
           </div>
         </div>
       </div>

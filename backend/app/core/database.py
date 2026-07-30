@@ -6,7 +6,13 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from app.core.config import settings
 from app.models.movie_statistic import MovieStatistic
 from app.models.user import User
-from app.models.user_movie_data import Favorite, Rating, Review, WatchHistory
+from app.models.user_movie_data import (
+    Favorite,
+    MoviePreference,
+    Rating,
+    Review,
+    WatchHistory,
+)
 
 
 class Database:
@@ -25,7 +31,15 @@ class Database:
         database = self.client[settings.mongodb_database]
         await init_beanie(
             database=database,
-            document_models=[User, Favorite, Rating, Review, WatchHistory, MovieStatistic],
+            document_models=[
+                User,
+                Favorite,
+                Rating,
+                Review,
+                WatchHistory,
+                MoviePreference,
+                MovieStatistic,
+            ],
         )
 
     async def disconnect(self) -> None:

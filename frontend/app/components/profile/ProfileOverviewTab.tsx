@@ -1,0 +1,182 @@
+'use client'
+
+import MovieCard from '@/app/components/MovieCard'
+import ProfileStatsTab from '@/app/components/profile/ProfileStatsTab'
+import type { MovieSummary } from '@/app/types/movie'
+
+interface ProfileOverviewTabProps {
+  favoriteMovies: MovieSummary[]
+  genreBreakdown: Array<{ count: number; name: string }>
+  ratingDistribution: Array<{ count: number; score: number }>
+  recentMovies: MovieSummary[]
+  stats: {
+    completedCount: number
+    meanScore: number
+    totalCount: number
+    watchingCount: number
+  }
+}
+
+export default function ProfileOverviewTab({
+  favoriteMovies,
+  genreBreakdown,
+  ratingDistribution,
+  recentMovies,
+  stats,
+}: ProfileOverviewTabProps) {
+  return (
+    <div className="space-y-8">
+      {/* Compact capsule KPI charts */}
+      <section aria-labelledby="activity-dashboard-title" className="space-y-4">
+        <div className="flex items-end justify-between gap-4 border-b border-zinc-800/80 pb-2">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-400">
+              Activity dashboard
+            </p>
+            <h2
+              className="mt-1 text-lg font-extrabold text-white"
+              id="activity-dashboard-title"
+            >
+              Profile snapshot
+            </h2>
+          </div>
+          <span className="hidden items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 sm:flex">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
+            Live profile data
+          </span>
+        </div>
+
+        <StatusCapsuleChart
+          completedCount={stats.completedCount}
+          totalCount={stats.totalCount}
+          watchingCount={stats.watchingCount}
+        />
+      </section>
+
+      <div className="pb-6">
+        <ProfileStatsTab
+          genreBreakdown={genreBreakdown}
+          meanScore={stats.meanScore}
+          ratingDistribution={ratingDistribution}
+        />
+      </div>
+
+      {/* Favorite Movies Showcase */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-300">
+            Favorite Movies
+          </h2>
+          <span className="text-xs text-zinc-500">{favoriteMovies.length} Favorites</span>
+        </div>
+
+        {favoriteMovies.length > 0 ? (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {favoriteMovies.map((movie) => (
+              <MovieCard key={movie.id} movie={movie} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-zinc-500">No favorite movies added yet.</p>
+        )}
+      </div>
+
+      {/* Recent Activity Showcase */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between border-b border-zinc-800/80 pb-2">
+          <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-300">
+            Recent Activity
+          </h2>
+        </div>
+
+        {recentMovies.length > 0 ? (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {recentMovies.map((movie) => (
+              <MovieCard key={movie.id} movie={movie} />
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-zinc-500">No recent activity.</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function StatusCapsuleChart({
+  completedCount,
+  totalCount,
+  watchingCount,
+}: {
+  completedCount: number
+  totalCount: number
+  watchingCount: number
+}) {
+  const planToWatchCount = Math.max(
+    totalCount - completedCount - watchingCount,
+    0,
+  )
+  const normalizedTotal = Math.max(totalCount, 1)
+  const statuses = [
+    { color: '#34d399', count: completedCount, label: 'Completed' },
+    { color: '#fbbf24', count: watchingCount, label: 'Watching' },
+    { color: '#60a5fa', count: planToWatchCount, label: 'Plan to Watch' },
+  ]
+
+  return (
+    <article className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 sm:p-5">
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <h3 className="text-sm font-bold text-zinc-200">Movie status</h3>
+          <p className="mt-1 text-[10px] text-zinc-500">
+            Compare how your movie list is distributed.
+          </p>
+        </div>
+        <div className="shrink-0 text-right">
+          <p className="text-2xl font-black text-white">{totalCount}</p>
+          <p className="text-[9px] font-semibold uppercase tracking-wider text-zinc-500">
+            Total movies
+          </p>
+        </div>
+      </div>
+
+      <div
+        aria-label={`Movie statuses: ${completedCount} completed, ${watchingCount} watching, ${planToWatchCount} plan to watch`}
+        className="mt-5 flex h-11 overflow-hidden rounded-full border-4 border-zinc-950 bg-zinc-800 shadow-inner"
+        role="img"
+      >
+        {statuses.map((status) => (
+          <div
+            key={status.label}
+            className="flex h-full items-center justify-center overflow-hidden border-r border-black/20 text-xs font-black text-zinc-950 last:border-r-0"
+            style={{
+              backgroundColor: status.color,
+              width: `${(status.count / normalizedTotal) * 100}%`,
+            }}
+          >
+            {status.count > 0 ? status.count : null}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4 grid gap-2 sm:grid-cols-3">
+        {statuses.map((status) => (
+          <div
+            key={status.label}
+            className="flex items-center justify-between gap-3 rounded-xl border border-zinc-800 bg-zinc-950/60 px-3 py-2"
+          >
+            <span className="flex min-w-0 items-center gap-2 text-[10px] font-semibold text-zinc-400">
+              <span
+                aria-hidden="true"
+                className="h-2.5 w-2.5 shrink-0 rounded-full"
+                style={{ backgroundColor: status.color }}
+              />
+              <span className="truncate">{status.label}</span>
+            </span>
+            <span className="text-sm font-black text-white">{status.count}</span>
+          </div>
+        ))}
+      </div>
+    </article>
+  )
+}

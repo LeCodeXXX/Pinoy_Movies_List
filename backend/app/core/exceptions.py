@@ -28,3 +28,28 @@ class TmdbAuthenticationError(ApplicationError):
 class TmdbUnavailableError(ApplicationError):
     def __init__(self, detail: str = "TMDB is temporarily unavailable") -> None:
         super().__init__(502, detail)
+
+
+class UserAlreadyExistsError(ApplicationError):
+    def __init__(self, field: str) -> None:
+        super().__init__(409, f"A user with that {field} already exists")
+
+
+class InvalidCredentialsError(ApplicationError):
+    def __init__(self) -> None:
+        super().__init__(401, "Invalid username/email or password")
+
+
+class InactiveUserError(ApplicationError):
+    def __init__(self) -> None:
+        super().__init__(403, "This account is inactive")
+
+
+class UserNotFoundError(ApplicationError):
+    def __init__(self) -> None:
+        super().__init__(404, "User was not found")
+
+
+class MoviePreferenceNotFoundError(ApplicationError):
+    def __init__(self, movie_id: int) -> None:
+        super().__init__(404, f"Movie {movie_id} is not in this user's list")
