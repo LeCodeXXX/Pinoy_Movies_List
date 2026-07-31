@@ -3,6 +3,7 @@
 import MovieCard from '@/app/components/MovieCard'
 import ProfileStatsTab from '@/app/components/profile/ProfileStatsTab'
 import type { MovieSummary } from '@/app/types/movie'
+import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 interface ProfileOverviewTabProps {
   favoriteMovies: MovieSummary[]
@@ -109,12 +110,17 @@ function StatusCapsuleChart({
     totalCount - completedCount - watchingCount,
     0,
   )
-  const normalizedTotal = Math.max(totalCount, 1)
   const statuses = [
     { color: '#34d399', count: completedCount, label: 'Completed' },
     { color: '#fbbf24', count: watchingCount, label: 'Watching' },
     { color: '#60a5fa', count: planToWatchCount, label: 'Plan to Watch' },
   ]
+  const chartData = [{
+    name: 'Movies',
+    completed: completedCount,
+    watching: watchingCount,
+    planToWatch: planToWatchCount,
+  }]
 
   return (
     <article className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 sm:p-5">
@@ -135,21 +141,23 @@ function StatusCapsuleChart({
 
       <div
         aria-label={`Movie statuses: ${completedCount} completed, ${watchingCount} watching, ${planToWatchCount} plan to watch`}
-        className="mt-5 flex h-11 overflow-hidden rounded-full border-4 border-zinc-950 bg-zinc-800 shadow-inner"
+        className="mt-5 h-14"
         role="img"
       >
-        {statuses.map((status) => (
-          <div
-            key={status.label}
-            className="flex h-full items-center justify-center overflow-hidden border-r border-black/20 text-xs font-black text-zinc-950 last:border-r-0"
-            style={{
-              backgroundColor: status.color,
-              width: `${(status.count / normalizedTotal) * 100}%`,
-            }}
-          >
-            {status.count > 0 ? status.count : null}
-          </div>
-        ))}
+        <ResponsiveContainer height="100%" width="100%">
+          <BarChart data={chartData} layout="vertical" margin={{ top: 4, right: 0, left: 0, bottom: 4 }}>
+            <XAxis axisLine={false} domain={[0, Math.max(totalCount, 1)]} hide type="number" />
+            <YAxis dataKey="name" hide type="category" />
+            <Tooltip
+              contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', color: '#fff' }}
+              formatter={(value, name) => [`${value} movie${value === 1 ? '' : 's'}`, name]}
+              cursor={{ fill: '#27272a', opacity: 0.25 }}
+            />
+            <Bar dataKey="completed" fill="#34d399" radius={[999, 0, 0, 999]} stackId="status" />
+            <Bar dataKey="watching" fill="#fbbf24" stackId="status" />
+            <Bar dataKey="planToWatch" fill="#60a5fa" radius={[0, 999, 999, 0]} stackId="status" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
       <div className="mt-4 grid gap-2 sm:grid-cols-3">

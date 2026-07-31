@@ -166,7 +166,40 @@ class MovieService:
                 "include_adult": False,
             },
         )
-        return await self._build_movie_list(data)
+        # TMDB's text-search endpoint has no origin-country filter. Validate
+        # each text-search candidate against its movie details before exposing
+        # it, otherwise `region=PH` still allows foreign titles through.
+        philippine_results = await self._filter_philippine_movies(
+            data.get("results") or [],
+            language,
+        )
+        return await self._build_movie_list(
+            {**data, "results": philippine_results}
+        )
+
+    async def _filter_philippine_movies(
+        self,
+        movies: list[dict[str, Any]],
+        language: str,
+    ) -> list[dict[str, Any]]:
+        async def is_philippine_movie(movie: dict[str, Any]) -> bool:
+            movie_id = movie.get("id")
+            if not isinstance(movie_id, int):
+                return False
+            details = await self.client.get(
+                f"/movie/{movie_id}",
+                params={"language": language},
+                movie_id=movie_id,
+            )
+            return any(
+                country.get("iso_3166_1") == settings.tmdb_default_region
+                for country in details.get("production_countries") or []
+            )
+
+        eligibility = await asyncio.gather(
+            *(is_philippine_movie(movie) for movie in movies)
+        )
+        return [movie for movie, allowed in zip(movies, eligibility) if allowed]
 
     async def _build_movie_detail(
         self,

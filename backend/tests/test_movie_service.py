@@ -8,8 +8,13 @@ from app.services.movie_service import DETAIL_APPENDICES, MovieService
 
 
 class FakeTmdbClient:
-    def __init__(self, response: dict[str, Any]) -> None:
+    def __init__(
+        self,
+        response: dict[str, Any],
+        movie_responses: dict[int, dict[str, Any]] | None = None,
+    ) -> None:
         self.response = response
+        self.movie_responses = movie_responses or {}
         self.path: str | None = None
         self.params: dict[str, str | int | bool] | None = None
         self.movie_id: int | None = None
@@ -23,7 +28,7 @@ class FakeTmdbClient:
         self.path = path
         self.params = params
         self.movie_id = movie_id
-        return self.response
+        return self.movie_responses.get(movie_id, self.response)
 
 
 class FakeMovieRatingRepository:
@@ -247,7 +252,37 @@ class MovieServiceTests(IsolatedAsyncioTestCase):
                     {**safe_movie, "id": 2, "adult": True},
                     {**safe_movie, "id": 3, "title": "A Softcore Story"},
                 ],
-            }
+            },
+            movie_responses={
+                1: {"production_countries": [{"iso_3166_1": "PH"}]},
+                2: {"production_countries": [{"iso_3166_1": "PH"}]},
+                3: {"production_countries": [{"iso_3166_1": "PH"}]},
+            },
+        )
+        service = MovieService(  # type: ignore[arg-type]
+            client,
+            rating_repository=FakeMovieRatingRepository(),
+        )
+
+        movies = await service.search_movies("story", 1, "en-US")
+
+        self.assertEqual([movie.id for movie in movies.results], [1])
+
+    async def test_search_limits_results_to_philippine_production_country(self) -> None:
+        client = FakeTmdbClient(
+            {
+                "page": 1,
+                "total_pages": 1,
+                "total_results": 2,
+                "results": [
+                    {"id": 1, "title": "Pinoy Story", "original_title": "Pinoy Story"},
+                    {"id": 2, "title": "Foreign Story", "original_title": "Foreign Story"},
+                ],
+            },
+            movie_responses={
+                1: {"production_countries": [{"iso_3166_1": "PH"}]},
+                2: {"production_countries": [{"iso_3166_1": "US"}]},
+            },
         )
         service = MovieService(  # type: ignore[arg-type]
             client,
