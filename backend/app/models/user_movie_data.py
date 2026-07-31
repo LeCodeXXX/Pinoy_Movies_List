@@ -41,15 +41,6 @@ class Rating(MovieInteraction):
         name = "ratings"
 
 
-class Review(MovieInteraction):
-    review: str = Field(min_length=1, max_length=5_000)
-    created_at: datetime = Field(default_factory=utc_now)
-    updated_at: datetime = Field(default_factory=utc_now)
-
-    class Settings(MovieInteraction.Settings):
-        name = "reviews"
-
-
 class MovieSnapshot(BaseModel):
     """Small TMDB snapshot used to render a list without repeated API requests."""
 
@@ -63,6 +54,24 @@ class MovieSnapshot(BaseModel):
     release_date: date | None = None
     genre_ids: list[int] = Field(default_factory=list)
     popularity: float = 0
+
+
+class Review(MovieInteraction):
+    """A user's single review, including the rating and renderable movie data."""
+
+    rating: int = Field(ge=1, le=10)
+    review: str = Field(min_length=1, max_length=5_000)
+    movie: MovieSnapshot
+    created_at: datetime = Field(default_factory=utc_now)
+    updated_at: datetime = Field(default_factory=utc_now)
+
+    class Settings(MovieInteraction.Settings):
+        name = "reviews"
+        indexes = [
+            *MovieInteraction.Settings.indexes,
+            IndexModel([("movie_id", ASCENDING), ("updated_at", DESCENDING)]),
+            IndexModel([("user_id", ASCENDING), ("updated_at", DESCENDING)]),
+        ]
 
 
 class MoviePreference(MovieInteraction):

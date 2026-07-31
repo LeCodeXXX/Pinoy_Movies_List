@@ -16,15 +16,15 @@ import ProfileOverviewTab from '@/app/components/profile/ProfileOverviewTab'
 import ProfileSidebar, {
   type ListCategoryFilter,
 } from '@/app/components/profile/ProfileSidebar'
-import ReviewsTab, {
-  type UserReviewItem,
-} from '@/app/components/profile/ReviewsTab'
+import ReviewsTab from '@/app/components/profile/ReviewsTab'
 import { getMovieGenreName, movieGenreNames } from '@/app/constants/movieGenres'
 import {
   getMoviePreferences,
   saveMoviePreference,
 } from '@/app/services/moviePreferenceApi'
+import { getUserReviews } from '@/app/services/movieReviewApi'
 import type { AuthUser } from '@/app/types/auth'
+import type { MovieReview } from '@/app/types/movieReview'
 
 const AUTH_USER_STORAGE_KEY = 'pinoy-cinema-auth-user'
 
@@ -44,7 +44,7 @@ export default function UserProfile() {
   const [selectedYear, setSelectedYear] = useState('all')
 
   const [movieListItems, setMovieListItems] = useState<MovieListItem[]>([])
-  const userReviews: UserReviewItem[] = []
+  const [userReviews, setUserReviews] = useState<MovieReview[]>([])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -66,16 +66,23 @@ export default function UserProfile() {
         return
       }
 
-      try {
-        const response = await getMoviePreferences(parsedUser.id, controller.signal)
-        setMovieListItems(response.results)
-      } catch (error) {
-        if (!controller.signal.aborted) {
-          console.error('Failed to load saved movie preferences', error)
-        }
-      } finally {
-        if (!controller.signal.aborted) setIsLoading(false)
+      const [preferencesResult, reviewsResult] = await Promise.allSettled([
+        getMoviePreferences(parsedUser.id, controller.signal),
+        getUserReviews(parsedUser.id, controller.signal),
+      ])
+      if (controller.signal.aborted) return
+
+      if (preferencesResult.status === 'fulfilled') {
+        setMovieListItems(preferencesResult.value.results)
+      } else {
+        console.error('Failed to load saved movie preferences', preferencesResult.reason)
       }
+      if (reviewsResult.status === 'fulfilled') {
+        setUserReviews(reviewsResult.value.results)
+      } else {
+        console.error('Failed to load user reviews', reviewsResult.reason)
+      }
+      setIsLoading(false)
     }
 
     void loadProfile()

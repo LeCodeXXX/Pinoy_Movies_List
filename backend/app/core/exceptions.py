@@ -53,3 +53,8 @@ class UserNotFoundError(ApplicationError):
 class MoviePreferenceNotFoundError(ApplicationError):
     def __init__(self, movie_id: int) -> None:
         super().__init__(404, f"Movie {movie_id} is not in this user's list")
+
+
+class MovieReviewNotFoundError(ApplicationError):
+    def __init__(self, movie_id: int) -> None:
+        super().__init__(404, f"This user has not reviewed movie {movie_id}")

@@ -7,7 +7,6 @@ import { useEffect, useState } from 'react'
 import BackToMovies from '@/app/components/BackToMovies'
 import MovieReviews from '@/app/components/movie-details/MovieReviews'
 import MoviePreferenceModal from '@/app/components/movie-preferences/MoviePreferenceModal'
-import { getMovieReviews } from '@/app/dummy/movieReviewsData'
 import { getMovie } from '@/app/services/movieApi'
 import { getMoviePreference } from '@/app/services/moviePreferenceApi'
 import type { AuthUser } from '@/app/types/auth'
@@ -91,7 +90,6 @@ export default function MovieDetails() {
   const currentPreference =
     preference?.movie_id === movieId ? preference : null
 
-  const reviews = getMovieReviews(movie.id)
   const releaseDate = movie.release_date
     ? new Intl.DateTimeFormat('en-PH', { dateStyle: 'long' }).format(
       new Date(movie.release_date),
@@ -175,7 +173,11 @@ export default function MovieDetails() {
         </div>
 
         <CommunityRating movie={movie} />
-        <MovieReviews reviews={reviews} />
+        <MovieReviews
+          key={`${movie.id}:${user?.id ?? 'guest'}`}
+          movie={movie}
+          user={user}
+        />
         <SimilarMovies movie={movie} />
       </main>
 
