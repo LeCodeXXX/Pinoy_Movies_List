@@ -62,8 +62,8 @@ export interface MovieSummary {
   release_date: string | null
   genre_ids: number[]
   popularity: number
-  tmdb_vote_average: number
-  tmdb_vote_count: number
+  vote_average: number
+  vote_count: number
 }
 
 export interface MovieListResponse {
@@ -97,8 +97,8 @@ export interface MovieDetail {
   homepage: string | null
   imdb_id: string | null
   popularity: number
-  tmdb_vote_average: number
-  tmdb_vote_count: number
+  vote_average: number
+  vote_count: number
   streaming_availability: StreamingAvailability
   similar_movies: MovieSummary[]
 }

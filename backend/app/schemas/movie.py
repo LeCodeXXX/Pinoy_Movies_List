@@ -69,8 +69,8 @@ class MovieSummaryResponse(BaseModel):
     release_date: date | None = None
     genre_ids: list[int] = Field(default_factory=list)
     popularity: float = 0
-    tmdb_vote_average: float = 0
-    tmdb_vote_count: int = 0
+    vote_average: float = 0
+    vote_count: int = 0
 
 
 class MovieListResponse(BaseModel):
@@ -104,7 +104,7 @@ class MovieDetailResponse(BaseModel):
     homepage: str | None = None
     imdb_id: str | None = None
     popularity: float = 0
-    tmdb_vote_average: float = 0
-    tmdb_vote_count: int = 0
+    vote_average: float = 0
+    vote_count: int = 0
     streaming_availability: StreamingAvailabilityResponse
     similar_movies: list[MovieSummaryResponse] = Field(default_factory=list)

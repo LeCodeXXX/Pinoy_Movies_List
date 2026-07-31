@@ -79,7 +79,7 @@ function matchesAdvancedFilters(
   const matchesYear = filters.year === 'all' || year === Number(filters.year)
   const matchesRating =
     filters.minRating === 'all' ||
-    movie.tmdb_vote_average >= Number(filters.minRating)
+    movie.vote_average >= Number(filters.minRating)
   const matchesReleasePeriod = (() => {
     if (year === null) return filters.releasePeriod === 'all'
     switch (filters.releasePeriod) {

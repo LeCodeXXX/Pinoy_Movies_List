@@ -5,6 +5,11 @@ from math import ceil
 from typing import Any
 
 from app.core.config import settings
+from app.repositories.movie_rating_repository import (
+    MovieRatingRepository,
+    MovieRatingSummary,
+    movie_rating_repository,
+)
 from app.schemas.movie import (
     CastMemberResponse,
     CrewMemberResponse,
@@ -37,9 +42,11 @@ class MovieService:
         self,
         client: TmdbClient,
         safety_service: ContentSafetyService = content_safety_service,
+        rating_repository: MovieRatingRepository = movie_rating_repository,
     ) -> None:
         self.client = client
         self.safety_service = safety_service
+        self.rating_repository = rating_repository
 
     async def get_movie(
         self,
@@ -56,7 +63,7 @@ class MovieService:
             movie_id=movie_id,
         )
         self.safety_service.ensure_movie_allowed(data, movie_id)
-        return self._build_movie_detail(data, region)
+        return await self._build_movie_detail(data, region)
 
     async def discover_philippine_movies(
         self,
@@ -106,7 +113,7 @@ class MovieService:
             page=page,
             total_pages=ceil(available_results / page_size) if available_results else 0,
             total_results=total_results,
-            results=self._build_summaries(selected_results),
+            results=await self._build_summaries(selected_results),
         )
 
     @staticmethod
@@ -159,9 +166,9 @@ class MovieService:
                 "include_adult": False,
             },
         )
-        return self._build_movie_list(data)
+        return await self._build_movie_list(data)
 
-    def _build_movie_detail(
+    async def _build_movie_detail(
         self,
         data: dict[str, Any],
         region: str,
@@ -169,6 +176,14 @@ class MovieService:
         credits = data.get("credits") or {}
         crew = credits.get("crew") or []
         providers = data.get("watch/providers") or {}
+        similar_movies = self._select_summary_movies(
+            (data.get("similar") or {}).get("results") or [],
+            MAX_SIMILAR_MOVIES,
+        )
+        rating_summaries = await self.rating_repository.summarize(
+            [data["id"], *(movie["id"] for movie in similar_movies)]
+        )
+        rating = rating_summaries.get(data["id"], MovieRatingSummary())
         return MovieDetailResponse(
             id=data["id"],
             title=data.get("title") or data.get("original_title") or "",
@@ -193,34 +208,47 @@ class MovieService:
             homepage=data.get("homepage") or None,
             imdb_id=data.get("imdb_id") or None,
             popularity=data.get("popularity") or 0,
-            tmdb_vote_average=data.get("vote_average") or 0,
-            tmdb_vote_count=data.get("vote_count") or 0,
+            vote_average=rating.average,
+            vote_count=rating.count,
             streaming_availability=self._build_availability(providers, region),
-            similar_movies=self._build_summaries(
-                (data.get("similar") or {}).get("results") or [],
-                MAX_SIMILAR_MOVIES,
-            ),
+            similar_movies=[
+                self._build_summary(movie, rating_summaries)
+                for movie in similar_movies
+            ],
         )
 
-    def _build_movie_list(self, data: dict[str, Any]) -> MovieListResponse:
+    async def _build_movie_list(self, data: dict[str, Any]) -> MovieListResponse:
         safe_results = self.safety_service.filter_movies(data.get("results") or [])
         return MovieListResponse(
             page=data.get("page") or 1,
             total_pages=data.get("total_pages") or 0,
             total_results=data.get("total_results") or 0,
-            results=self._build_summaries(safe_results),
+            results=await self._build_summaries(safe_results),
         )
 
-    def _build_summaries(
+    async def _build_summaries(
         self,
         movies: list[dict[str, Any]],
         limit: int | None = None,
     ) -> list[MovieSummaryResponse]:
+        selected_movies = self._select_summary_movies(movies, limit)
+        rating_summaries = await self.rating_repository.summarize(
+            [movie["id"] for movie in selected_movies]
+        )
+        return [
+            self._build_summary(movie, rating_summaries)
+            for movie in selected_movies
+        ]
+
+    def _select_summary_movies(
+        self,
+        movies: list[dict[str, Any]],
+        limit: int | None = None,
+    ) -> list[dict[str, Any]]:
         safe_movies = self._deduplicate_movies(
             self.safety_service.filter_movies(movies)
         )
-        selected_movies = safe_movies[:limit] if limit is not None else safe_movies
-        return [self._build_summary(movie) for movie in selected_movies]
+        return safe_movies[:limit] if limit is not None else safe_movies
 
     @staticmethod
     def _deduplicate_movies(movies: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -235,7 +263,12 @@ class MovieService:
             unique_movies.append(movie)
         return unique_movies
 
-    def _build_summary(self, movie: dict[str, Any]) -> MovieSummaryResponse:
+    def _build_summary(
+        self,
+        movie: dict[str, Any],
+        rating_summaries: dict[int, MovieRatingSummary],
+    ) -> MovieSummaryResponse:
+        rating = rating_summaries.get(movie["id"], MovieRatingSummary())
         return MovieSummaryResponse(
             id=movie["id"],
             title=movie.get("title") or movie.get("original_title") or "",
@@ -247,8 +280,8 @@ class MovieService:
             release_date=movie.get("release_date") or None,
             genre_ids=movie.get("genre_ids") or [],
             popularity=movie.get("popularity") or 0,
-            tmdb_vote_average=movie.get("vote_average") or 0,
-            tmdb_vote_count=movie.get("vote_count") or 0,
+            vote_average=rating.average,
+            vote_count=rating.count,
         )
 
     def _build_cast(self, cast: list[dict[str, Any]]) -> list[CastMemberResponse]:

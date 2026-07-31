@@ -40,7 +40,7 @@ export default function MovieListTab({ items, onEdit }: MovieListTabProps) {
         <p className="text-xs font-bold uppercase tracking-wider text-zinc-400">Entries ({items.length})</p>
         <div className="flex items-center gap-2">
           <label className="sr-only" htmlFor="movie-list-sort">Sort movie list</label>
-          <select className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-semibold text-zinc-300 outline-none focus:border-blue-500/60" id="movie-list-sort" onChange={(event) => setSortBy(event.target.value as SortOption)} value={sortBy}>
+          <select className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-semibold text-zinc-300 outline-none focus:border-red-500/60" id="movie-list-sort" onChange={(event) => setSortBy(event.target.value as SortOption)} value={sortBy}>
             <option value="date">Last updated</option>
             <option value="name">Name</option>
             <option value="rating">User rating</option>
@@ -79,7 +79,7 @@ function DetailedMovieRow({ item, onEdit }: { item: MovieListItem; onEdit: (item
       </Link>
       <div className="flex min-w-0 flex-1 flex-col justify-between py-1">
         <div>
-          <Link className="hover:text-blue-300" href={`/movies/${movie.id}`}><h3 className="truncate text-base font-extrabold text-white">{movie.title}</h3></Link>
+          <Link className="hover:text-red-300" href={`/movies/${movie.id}`}><h3 className="truncate text-base font-extrabold text-white">{movie.title}</h3></Link>
           <p className="mt-0.5 text-[11px] text-zinc-400">{movie.release_date?.slice(0, 4) ?? 'TBA'}</p>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-2 pt-2">
@@ -107,7 +107,7 @@ function CompactMovieTable({ items, onEdit }: { items: MovieListItem[]; onEdit: 
             return (
               <tr className="transition hover:bg-zinc-800/40" key={item.movie_id}>
                 <td className="py-2.5 pl-4 pr-2">
-                  <Link className="flex items-center gap-3 font-semibold text-white hover:text-blue-400" href={`/movies/${movie.id}`}>
+                  <Link className="flex items-center gap-3 font-semibold text-white hover:text-red-400" href={`/movies/${movie.id}`}>
                     <span className="relative h-10 w-7 shrink-0 overflow-hidden rounded-md bg-zinc-950">{movie.poster_url ? <Image alt="" className="object-cover" fill sizes="28px" src={movie.poster_url} /> : null}</span>
                     <span className="max-w-xs truncate sm:max-w-md">{movie.title}</span>
                   </Link>
@@ -143,20 +143,20 @@ function MoviePreferenceCard({ item, onEdit }: { item: MovieListItem; onEdit: (i
 }
 
 function StatusBadge({ status }: Pick<MovieListItem, 'status'>) {
-  const color = status === 'completed' ? 'border-blue-500/30 bg-blue-950 text-blue-300' : status === 'watching' ? 'border-emerald-500/30 bg-emerald-950 text-emerald-300' : 'border-zinc-700 bg-zinc-900 text-zinc-300'
+  const color = status === 'completed' ? 'border-red-500/30 bg-red-950 text-red-300' : status === 'watching' ? 'border-emerald-500/30 bg-emerald-950 text-emerald-300' : 'border-zinc-700 bg-zinc-900 text-zinc-300'
   return <span className={`inline-block rounded-md border px-2 py-1 text-[9px] font-bold ${color}`}>{MOVIE_STATUS_LABELS[status]}</span>
 }
 
 function Rating({ rating, large = false }: { rating: number | null; large?: boolean }) {
-  return rating ? <span className={`${large ? 'text-2xl' : 'text-lg'} font-black tracking-tight text-blue-300/75`}>{rating}<span className="ml-1 text-xs text-zinc-500">/10</span></span> : <span className="text-zinc-600">—</span>
+  return rating ? <span className={`${large ? 'text-2xl' : 'text-lg'} font-black tracking-tight text-red-300/75`}>{rating}<span className="ml-1 text-xs text-zinc-500">/10</span></span> : <span className="text-zinc-600">—</span>
 }
 
 function EditButton({ item, onEdit }: { item: MovieListItem; onEdit: (item: MovieListItem) => void }) {
-  return <button aria-label={`Edit preferences for ${item.movie.title}`} className="rounded-lg bg-blue-600 px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-white transition hover:bg-blue-500" onClick={() => onEdit(item)} type="button">Edit</button>
+  return <button aria-label={`Edit preferences for ${item.movie.title}`} className="rounded-lg bg-red-600 px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-white transition hover:bg-red-500" onClick={() => onEdit(item)} type="button">Edit</button>
 }
 
 function ViewButton({ active, children, label, onClick }: { active: boolean; children: ReactNode; label: string; onClick: () => void }) {
-  return <button aria-label={label} className={`rounded-lg p-1.5 transition ${active ? 'bg-blue-600 text-white' : 'text-zinc-500 hover:text-zinc-200'}`} onClick={onClick} title={label} type="button">{children}</button>
+  return <button aria-label={label} className={`rounded-lg p-1.5 transition ${active ? 'bg-red-600 text-white' : 'text-zinc-500 hover:text-zinc-200'}`} onClick={onClick} title={label} type="button">{children}</button>
 }
 
 function GridViewIcon() { return <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" strokeWidth={1.8} /></svg> }

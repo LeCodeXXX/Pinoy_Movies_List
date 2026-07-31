@@ -3,6 +3,7 @@
 from typing import Any
 from unittest import IsolatedAsyncioTestCase
 
+from app.repositories.movie_rating_repository import MovieRatingSummary
 from app.services.movie_service import DETAIL_APPENDICES, MovieService
 
 
@@ -25,6 +26,26 @@ class FakeTmdbClient:
         return self.response
 
 
+class FakeMovieRatingRepository:
+    def __init__(
+        self,
+        summaries: dict[int, MovieRatingSummary] | None = None,
+    ) -> None:
+        self.summaries = summaries or {}
+        self.requested_movie_ids: list[int] = []
+
+    async def summarize(
+        self,
+        movie_ids: list[int],
+    ) -> dict[int, MovieRatingSummary]:
+        self.requested_movie_ids = movie_ids
+        return {
+            movie_id: self.summaries[movie_id]
+            for movie_id in movie_ids
+            if movie_id in self.summaries
+        }
+
+
 class MovieServiceTests(IsolatedAsyncioTestCase):
     async def test_get_movie_normalizes_appended_tmdb_data(self) -> None:
         client = FakeTmdbClient(
@@ -34,6 +55,8 @@ class MovieServiceTests(IsolatedAsyncioTestCase):
                 "original_title": "Sample Film",
                 "original_language": "tl",
                 "overview": "A sample synopsis.",
+                "vote_average": 9.9,
+                "vote_count": 50_000,
                 "poster_path": "/poster.jpg",
                 "backdrop_path": "/backdrop.jpg",
                 "release_date": "2026-01-02",
@@ -80,7 +103,13 @@ class MovieServiceTests(IsolatedAsyncioTestCase):
                 "similar": {"results": []},
             }
         )
-        service = MovieService(client)  # type: ignore[arg-type]
+        ratings = FakeMovieRatingRepository(
+            {770: MovieRatingSummary(average=8.5, count=2)}
+        )
+        service = MovieService(  # type: ignore[arg-type]
+            client,
+            rating_repository=ratings,
+        )
 
         movie = await service.get_movie(770)
 
@@ -91,6 +120,9 @@ class MovieServiceTests(IsolatedAsyncioTestCase):
         self.assertEqual(movie.trailer.youtube_key, "trailer-key")
         self.assertEqual(movie.streaming_availability.streaming[0].name, "Provider")
         self.assertTrue(movie.poster_url.endswith("/w500/poster.jpg"))
+        self.assertEqual(movie.vote_average, 8.5)
+        self.assertEqual(movie.vote_count, 2)
+        self.assertEqual(ratings.requested_movie_ids, [770])
 
     async def test_discover_limits_results_to_philippine_origin(self) -> None:
         client = FakeTmdbClient(
@@ -105,11 +137,19 @@ class MovieServiceTests(IsolatedAsyncioTestCase):
                         "original_title": "Filipino Film",
                         "original_language": "tl",
                         "overview": "",
+                        "vote_average": 9.8,
+                        "vote_count": 25_000,
                     }
                 ],
             }
         )
-        service = MovieService(client)  # type: ignore[arg-type]
+        ratings = FakeMovieRatingRepository(
+            {42: MovieRatingSummary(average=7.5, count=4)}
+        )
+        service = MovieService(  # type: ignore[arg-type]
+            client,
+            rating_repository=ratings,
+        )
 
         movies = await service.discover_philippine_movies(1, "en-US", "popularity.desc")
 
@@ -118,6 +158,8 @@ class MovieServiceTests(IsolatedAsyncioTestCase):
         self.assertEqual(client.params["without_companies"], "149142")
         self.assertFalse(client.params["include_adult"])
         self.assertEqual(movies.results[0].id, 42)
+        self.assertEqual(movies.results[0].vote_average, 7.5)
+        self.assertEqual(movies.results[0].vote_count, 4)
 
     async def test_discover_supports_genre_and_custom_page_size(self) -> None:
         client = FakeTmdbClient(
@@ -138,7 +180,10 @@ class MovieServiceTests(IsolatedAsyncioTestCase):
                 ],
             }
         )
-        service = MovieService(client)  # type: ignore[arg-type]
+        service = MovieService(  # type: ignore[arg-type]
+            client,
+            rating_repository=FakeMovieRatingRepository(),
+        )
 
         movies = await service.discover_philippine_movies(
             1,
@@ -170,7 +215,10 @@ class MovieServiceTests(IsolatedAsyncioTestCase):
                 ],
             }
         )
-        service = MovieService(client)  # type: ignore[arg-type]
+        service = MovieService(  # type: ignore[arg-type]
+            client,
+            rating_repository=FakeMovieRatingRepository(),
+        )
 
         movies = await service.discover_philippine_movies(
             1,
@@ -201,7 +249,10 @@ class MovieServiceTests(IsolatedAsyncioTestCase):
                 ],
             }
         )
-        service = MovieService(client)  # type: ignore[arg-type]
+        service = MovieService(  # type: ignore[arg-type]
+            client,
+            rating_repository=FakeMovieRatingRepository(),
+        )
 
         movies = await service.search_movies("story", 1, "en-US")
 

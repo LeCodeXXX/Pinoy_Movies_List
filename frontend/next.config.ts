@@ -17,6 +17,13 @@ const nextConfig: NextConfig = {
         pathname: "/vi/**",
         search: "",
       },
+      {
+        protocol: "https",
+        hostname: "www.themoviedb.org",
+        port: "",
+        pathname: "/assets/**",
+        search: "",
+      },
     ],
   },
 };

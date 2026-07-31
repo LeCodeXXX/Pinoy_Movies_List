@@ -225,7 +225,7 @@ export default function UserProfile() {
     return (
       <div className="flex min-h-[75vh] items-center justify-center bg-zinc-950 text-zinc-400">
         <div className="flex items-center gap-3 text-sm font-semibold">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-blue-500 border-t-transparent" />
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-red-500 border-t-transparent" />
           Loading user profile...
         </div>
       </div>
@@ -234,7 +234,7 @@ export default function UserProfile() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-zinc-950 px-4 py-16 text-zinc-100 selection:bg-blue-500 selection:text-white">
+      <div className="min-h-screen bg-zinc-950 px-4 py-16 text-zinc-100 selection:bg-red-500 selection:text-white">
         <div className="mx-auto max-w-lg rounded-3xl border border-zinc-800 bg-zinc-900/60 p-8 text-center shadow-2xl backdrop-blur-md">
           <h1 className="text-2xl font-extrabold text-white">
             Sign In Required
@@ -244,7 +244,7 @@ export default function UserProfile() {
           </p>
           <div className="mt-6">
             <Link
-              className="inline-flex items-center justify-center rounded-xl bg-blue-600 px-6 py-3 text-xs font-extrabold text-white shadow-lg transition hover:bg-blue-500"
+              className="inline-flex items-center justify-center rounded-xl bg-red-600 px-6 py-3 text-xs font-extrabold text-white shadow-lg transition hover:bg-red-500"
               href="/"
             >
               Return Home to Sign In
@@ -256,7 +256,7 @@ export default function UserProfile() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-blue-500 selection:text-white">
+    <div className="min-h-screen bg-zinc-950 font-sans text-zinc-100 selection:bg-red-500 selection:text-white">
       {/* Navigation Header Link */}
       <header className="sticky top-0 z-40 border-b border-zinc-900 bg-zinc-950/80 backdrop-blur-md">
         <div className="mx-auto flex max-w-[1600px] items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
@@ -343,7 +343,7 @@ export default function UserProfile() {
                     <p className="text-sm font-bold text-white">{user.email}</p>
                   </div>
                   <button
-                    className="rounded-xl border border-blue-500/30 bg-blue-950/30 px-4 py-2.5 text-xs font-bold text-blue-300 transition hover:bg-blue-900/50"
+                    className="rounded-xl border border-red-500/30 bg-red-950/30 px-4 py-2.5 text-xs font-bold text-red-300 transition hover:bg-red-900/50"
                     onClick={() => setIsEditModalOpen(true)}
                     type="button"
                   >

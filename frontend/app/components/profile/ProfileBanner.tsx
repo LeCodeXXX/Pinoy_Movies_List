@@ -14,7 +14,7 @@ export default function ProfileBanner({
   return (
     <div className="relative w-full bg-zinc-950">
       {/* Full-Width Cover Banner */}
-      <div className="relative h-48 w-full overflow-hidden bg-gradient-to-r from-slate-900 via-indigo-950 to-zinc-900 sm:h-64 md:h-72">
+      <div className="relative h-48 w-full overflow-hidden bg-gradient-to-r from-zinc-950 via-red-950 to-zinc-900 sm:h-64 md:h-72">
         {user.banner_picture ? (
           <div
             aria-label={`${user.display_name}'s profile banner`}
@@ -28,7 +28,7 @@ export default function ProfileBanner({
         {/* Background glow and subtle ambient pattern */}
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-blue-600/20 via-red-900/10 to-transparent"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-red-600/20 via-red-900/10 to-transparent"
         />
         <div
           aria-hidden="true"
@@ -55,13 +55,13 @@ export default function ProfileBanner({
                 src={user.profile_picture}
               />
             ) : (
-              <div className="flex h-28 w-28 items-center justify-center rounded-2xl border-4 border-zinc-950 bg-gradient-to-br from-indigo-900 via-blue-950 to-zinc-900 text-4xl font-black uppercase text-blue-200 shadow-2xl transition duration-300 group-hover:scale-105 sm:h-36 sm:w-36">
+              <div className="flex h-28 w-28 items-center justify-center rounded-2xl border-4 border-zinc-950 bg-gradient-to-br from-red-900 via-red-950 to-zinc-900 text-4xl font-black uppercase text-red-200 shadow-2xl transition duration-300 group-hover:scale-105 sm:h-36 sm:w-36">
                 {getInitials(user.display_name)}
               </div>
             )}
             <span
               aria-label="Verified user"
-              className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-zinc-950 bg-blue-500 text-xs font-bold text-white shadow-lg"
+              className="absolute -bottom-1 -right-1 flex h-7 w-7 items-center justify-center rounded-full border-2 border-zinc-950 bg-red-500 text-xs font-bold text-white shadow-lg"
               title="Verified Cinephile"
             >
               ✓

@@ -63,8 +63,6 @@ class MovieSnapshot(BaseModel):
     release_date: date | None = None
     genre_ids: list[int] = Field(default_factory=list)
     popularity: float = 0
-    tmdb_vote_average: float = 0
-    tmdb_vote_count: int = 0
 
 
 class MoviePreference(MovieInteraction):

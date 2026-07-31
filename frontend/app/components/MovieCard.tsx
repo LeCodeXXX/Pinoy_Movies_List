@@ -16,8 +16,8 @@ export default function MovieCard({
 }: MovieCardProps) {
   const year = movie.release_date?.slice(0, 4) ?? 'TBA'
   const genre = getMovieGenreNames(movie.genre_ids)[0] ?? 'Film'
-  const hasRating = movie.tmdb_vote_count > 0 && movie.tmdb_vote_average > 0
-  const rating = hasRating ? movie.tmdb_vote_average.toFixed(1) : 'N/A'
+  const hasRating = movie.vote_count > 0
+  const rating = hasRating ? movie.vote_average.toFixed(1) : 'N/A'
 
   return (
     <article
@@ -72,7 +72,7 @@ export default function MovieCard({
 
       <div className="flex flex-1 items-center justify-between gap-2 p-3 text-[10px] text-zinc-500">
         <span>{year}</span>
-        <span>{movie.tmdb_vote_count.toLocaleString()} votes</span>
+        <span>{movie.vote_count.toLocaleString()} app votes</span>
       </div>
     </article>
   )

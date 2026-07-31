@@ -49,7 +49,7 @@ export default function ProfileSidebar({
           <SearchIcon />
         </span>
         <input
-          className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 py-2.5 pl-9 pr-3 text-xs text-white placeholder-zinc-500 outline-none transition focus:border-blue-500/60 focus:ring-1 focus:ring-blue-500/40"
+          className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 py-2.5 pl-9 pr-3 text-xs text-white placeholder-zinc-500 outline-none transition focus:border-red-500/60 focus:ring-1 focus:ring-red-500/40"
           onChange={(e) => onQueryChange(e.target.value)}
           placeholder="Filter movies…"
           type="text"
@@ -92,7 +92,7 @@ export default function ProfileSidebar({
         <label className="block space-y-1 text-xs font-semibold text-zinc-400">
           Genres & Tags
           <select
-            className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-xs text-white outline-none transition focus:border-blue-500/60"
+            className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-xs text-white outline-none transition focus:border-red-500/60"
             onChange={(e) => onGenreChange(e.target.value)}
             value={selectedGenre}
           >
@@ -109,7 +109,7 @@ export default function ProfileSidebar({
         <label className="block space-y-1 text-xs font-semibold text-zinc-400">
           Release Year
           <select
-            className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-xs text-white outline-none transition focus:border-blue-500/60"
+            className="w-full rounded-xl border border-zinc-800 bg-zinc-900/80 px-3 py-2 text-xs text-white outline-none transition focus:border-red-500/60"
             onChange={(e) => onYearChange(e.target.value)}
             value={selectedYear}
           >
@@ -134,7 +134,7 @@ export default function ProfileSidebar({
             <p className="text-[10px] text-zinc-500">Total Entries</p>
           </div>
           <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-2.5">
-            <p className="text-base font-extrabold text-blue-400">
+            <p className="text-base font-extrabold text-red-400">
               {stats.meanScore ? stats.meanScore.toFixed(1) : 'N/A'}
             </p>
             <p className="text-[10px] text-zinc-500">Mean Score</p>

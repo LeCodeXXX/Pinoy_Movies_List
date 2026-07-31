@@ -82,8 +82,6 @@ class FakeMovies:
             release_date=None,
             genres=[SimpleNamespace(id=18)],
             popularity=10.0,
-            tmdb_vote_average=8.1,
-            tmdb_vote_count=100,
         )
 
 

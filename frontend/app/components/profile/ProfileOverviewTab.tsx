@@ -30,9 +30,6 @@ export default function ProfileOverviewTab({
       <section aria-labelledby="activity-dashboard-title" className="space-y-4">
         <div className="flex items-end justify-between gap-4 border-b border-zinc-800/80 pb-2">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-blue-400">
-              Activity dashboard
-            </p>
             <h2
               className="mt-1 text-lg font-extrabold text-white"
               id="activity-dashboard-title"
@@ -40,10 +37,6 @@ export default function ProfileOverviewTab({
               Profile snapshot
             </h2>
           </div>
-          <span className="hidden items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-zinc-500 sm:flex">
-            <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-400" />
-            Live profile data
-          </span>
         </div>
 
         <StatusCapsuleChart

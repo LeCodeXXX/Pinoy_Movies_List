@@ -23,11 +23,11 @@ export default function ProfileStatsTab({
           <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-300">
             Score Distribution (1-10)
           </h2>
-          <div className="rounded-xl border border-blue-500/20 bg-blue-950/30 px-3 py-2 text-right">
+          <div className="rounded-xl border border-red-500/20 bg-red-950/30 px-3 py-2 text-right">
             <p className="text-[9px] font-bold uppercase tracking-wider text-zinc-500">
               Average given
             </p>
-            <p className="text-lg font-black text-blue-300">
+            <p className="text-lg font-black text-red-300">
               {meanScore ? meanScore.toFixed(1) : 'N/A'}
               {meanScore ? <span className="text-xs text-zinc-500"> / 10</span> : null}
             </p>
@@ -46,7 +46,7 @@ export default function ProfileStatsTab({
                   {count}
                 </span>
                 <div
-                  className="w-full rounded-t-lg bg-blue-600 transition duration-300 group-hover:bg-blue-500"
+                  className="w-full rounded-t-lg bg-red-600 transition duration-300 group-hover:bg-red-500"
                   style={{ height: `${Math.max(heightPercent, 4)}%` }}
                 />
                 <span className="text-xs font-bold text-zinc-400">{score}</span>

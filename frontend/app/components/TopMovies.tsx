@@ -143,8 +143,10 @@ function RankingMovie({
     category === 'popular'
       ? `${movie.popularity.toFixed(1)} popularity`
       : category === 'rated'
-        ? `${movie.tmdb_vote_average.toFixed(1)} / 10`
-        : `${movie.tmdb_vote_count.toLocaleString()} votes`
+        ? movie.vote_count > 0
+          ? `${movie.vote_average.toFixed(1)} / 10`
+          : 'Not yet rated'
+        : `${movie.vote_count.toLocaleString()} app votes`
 
   return (
     <li>

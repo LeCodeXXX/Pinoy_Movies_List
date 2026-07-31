@@ -174,7 +174,7 @@ export default function MovieDetails() {
           </aside>
         </div>
 
-        <TmdbRating movie={movie} />
+        <CommunityRating movie={movie} />
         <MovieReviews reviews={reviews} />
         <SimilarMovies movie={movie} />
       </main>
@@ -232,8 +232,14 @@ function MovieHero({
           <p className="mt-4 text-sm text-zinc-400">{movie.original_title} · {movie.release_date?.slice(0, 4) ?? 'TBA'}</p>
           <div className="mt-6 inline-flex w-fit items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-emerald-400">
             <span className="text-xl">★</span>
-            <span className="text-2xl font-black">{movie.tmdb_vote_average.toFixed(1)}</span>
-            <span className="text-xs text-zinc-500">/ 10 · {movie.tmdb_vote_count.toLocaleString()} votes</span>
+            <span className="text-2xl font-black">
+              {movie.vote_count > 0 ? movie.vote_average.toFixed(1) : 'N/A'}
+            </span>
+            <span className="text-xs text-zinc-500">
+              {movie.vote_count > 0
+                ? `/ 10 · ${movie.vote_count.toLocaleString()} app votes`
+                : 'No app ratings yet'}
+            </span>
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <button
@@ -331,21 +337,25 @@ function TrailerSection({ movie }: { movie: MovieDetail }) {
   )
 }
 
-function TmdbRating({ movie }: { movie: MovieDetail }) {
-  const score = Math.min(10, Math.max(0, movie.tmdb_vote_average))
+function CommunityRating({ movie }: { movie: MovieDetail }) {
+  const score = Math.min(10, Math.max(0, movie.vote_average))
   return (
     <section className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 sm:p-6">
-      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400">Audience score</p>
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400">App community score</p>
       <div className="mt-1 flex items-end justify-between gap-4">
-        <h2 className="text-2xl font-extrabold text-white">Rating</h2>
-        <p><span className="text-3xl font-black text-white">{score.toFixed(1)}</span><span className="text-sm text-zinc-500"> / 10</span></p>
+        <h2 className="text-2xl font-extrabold text-white">User rating</h2>
+        <p><span className="text-3xl font-black text-white">{movie.vote_count > 0 ? score.toFixed(1) : 'N/A'}</span>{movie.vote_count > 0 ? <span className="text-sm text-zinc-500"> / 10</span> : null}</p>
       </div>
       <div className="relative mt-6 h-5 overflow-hidden rounded-full bg-zinc-800">
         <div className={`h-full rounded-full ${score >= 5 ? 'bg-emerald-500' : 'bg-red-500'}`} style={{ width: `${score * 10}%` }} />
         <div className="absolute bottom-0 left-1/2 top-0 w-0.5 bg-red-400" title="5/10 midpoint" />
       </div>
       <div className="mt-2 flex justify-between text-[10px] text-zinc-600"><span>0</span><span className="text-red-400">5 midpoint</span><span>10</span></div>
-      <p className="mt-4 text-xs text-zinc-500">Based on {movie.tmdb_vote_count.toLocaleString()} audience votes.</p>
+      <p className="mt-4 text-xs text-zinc-500">
+        {movie.vote_count > 0
+          ? `Based on ${movie.vote_count.toLocaleString()} rating${movie.vote_count === 1 ? '' : 's'} from users of this app.`
+          : 'No users have rated this movie yet.'}
+      </p>
     </section>
   )
 }

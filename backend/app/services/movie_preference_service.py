@@ -62,8 +62,6 @@ class MoviePreferenceService:
                 release_date=movie.release_date,
                 genre_ids=[genre.id for genre in movie.genres],
                 popularity=movie.popularity,
-                tmdb_vote_average=movie.tmdb_vote_average,
-                tmdb_vote_count=movie.tmdb_vote_count,
             )
             try:
                 preference = await self.repository.create(
