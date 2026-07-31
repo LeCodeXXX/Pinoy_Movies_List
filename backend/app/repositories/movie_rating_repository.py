@@ -9,6 +9,7 @@ from app.models.user_movie_data import MoviePreference
 class MovieRatingSummary:
     average: float = 0
     count: int = 0
+    distribution: tuple[int, ...] = (0,) * 10
 
 
 class MovieRatingRepository:
@@ -28,19 +29,26 @@ class MovieRatingRepository:
             },
             {
                 "$group": {
-                    "_id": "$movie_id",
-                    "average": {"$avg": "$rating"},
+                    "_id": {"movie_id": "$movie_id", "rating": "$rating"},
                     "count": {"$sum": 1},
                 }
             },
         ]
         results = await MoviePreference.aggregate(pipeline).to_list()
+        distributions: dict[int, list[int]] = {}
+        for result in results:
+            movie_id = int(result["_id"]["movie_id"])
+            rating = int(result["_id"]["rating"])
+            distributions.setdefault(movie_id, [0] * 10)[rating - 1] = int(result["count"])
+
         return {
-            result["_id"]: MovieRatingSummary(
-                average=float(result["average"]),
-                count=int(result["count"]),
+            movie_id: MovieRatingSummary(
+                average=sum((index + 1) * count for index, count in enumerate(distribution))
+                / sum(distribution),
+                count=sum(distribution),
+                distribution=tuple(distribution),
             )
-            for result in results
+            for movie_id, distribution in distributions.items()
         }
 
 

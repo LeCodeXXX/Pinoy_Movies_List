@@ -20,9 +20,9 @@ export default function ProfileHeader({
 }: ProfileHeaderProps) {
   const memberSince = user.created_at
     ? new Date(user.created_at).toLocaleDateString('en-US', {
-        month: 'long',
-        year: 'numeric',
-      })
+      month: 'long',
+      year: 'numeric',
+    })
     : 'Recently'
 
   return (

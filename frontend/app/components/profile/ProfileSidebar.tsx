@@ -134,7 +134,7 @@ export default function ProfileSidebar({
             <p className="text-[10px] text-zinc-500">Total Entries</p>
           </div>
           <div className="rounded-xl border border-zinc-800 bg-zinc-950 p-2.5">
-            <p className="text-base font-extrabold text-red-400">
+            <p className="text-base font-extrabold">
               {stats.meanScore ? stats.meanScore.toFixed(1) : 'N/A'}
             </p>
             <p className="text-[10px] text-zinc-500">Mean Score</p>

@@ -106,5 +106,6 @@ class MovieDetailResponse(BaseModel):
     popularity: float = 0
     vote_average: float = 0
     vote_count: int = 0
+    rating_distribution: list[int] = Field(default_factory=lambda: [0] * 10)
     streaming_availability: StreamingAvailabilityResponse
     similar_movies: list[MovieSummaryResponse] = Field(default_factory=list)

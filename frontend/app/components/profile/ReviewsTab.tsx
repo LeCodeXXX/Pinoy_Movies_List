@@ -56,8 +56,8 @@ export default function ReviewsTab({ reviews }: ReviewsTabProps) {
                   {movie.title}
                 </Link>
                 <div className="flex items-center gap-2">
-                  <span className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-2 py-1 text-[11px] font-black text-amber-300">
-                    &#9733; {rating} / 10
+                  <span className="text-[11px] font-black text-blue-300">
+                    {rating} / 10
                   </span>
                   <span className="text-[11px] font-medium text-zinc-500">
                     {formatReviewDate(updated_at)}
@@ -65,7 +65,7 @@ export default function ReviewsTab({ reviews }: ReviewsTabProps) {
                 </div>
               </div>
 
-              <p className="text-xs leading-relaxed text-zinc-300">
+              <p className="text-xs leading-relaxed text-zinc-300 italic">
                 &ldquo;{review}&rdquo;
               </p>
             </div>

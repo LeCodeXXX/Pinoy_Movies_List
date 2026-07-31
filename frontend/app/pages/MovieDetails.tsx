@@ -3,6 +3,16 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { useParams } from 'next/navigation'
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  LabelList,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts'
 import { useEffect, useState } from 'react'
 import BackToMovies from '@/app/components/BackToMovies'
 import MovieReviews from '@/app/components/movie-details/MovieReviews'
@@ -172,13 +182,17 @@ export default function MovieDetails() {
           </aside>
         </div>
 
-        <CommunityRating movie={movie} />
+        <div className="mt-10">
+          <CommunityRating movie={movie} />
+        </div>
         <MovieReviews
           key={`${movie.id}:${user?.id ?? 'guest'}`}
           movie={movie}
           user={user}
         />
-        <SimilarMovies movie={movie} />
+        <div className="mt-10">
+          <SimilarMovies movie={movie} />
+        </div>
       </main>
 
       {user && isListModalOpen ? (
@@ -224,7 +238,7 @@ function MovieHero({
         <div className="flex min-w-0 flex-col justify-center">
           <div className="flex flex-wrap gap-2">
             {movie.genres.map((genre) => (
-              <span key={genre.id} className="rounded-full border border-red-400/20 bg-red-500/10 px-2.5 py-1 text-[10px] font-semibold text-red-300">
+              <span key={genre.id} className="rounded-full border px-2.5 py-1 text-[10px] font-semibold">
                 {genre.name}
               </span>
             ))}
@@ -232,9 +246,8 @@ function MovieHero({
           <h1 className="mt-4 text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">{movie.title}</h1>
           {movie.tagline ? <p className="mt-2 text-lg italic text-zinc-400">“{movie.tagline}”</p> : null}
           <p className="mt-4 text-sm text-zinc-400">{movie.original_title} · {movie.release_date?.slice(0, 4) ?? 'TBA'}</p>
-          <div className="mt-6 inline-flex w-fit items-center gap-2 rounded-xl border border-emerald-500/20 bg-emerald-500/10 px-3 py-2 text-emerald-400">
-            <span className="text-xl">★</span>
-            <span className="text-2xl font-black">
+          <div className="mt-6 inline-flex w-fit items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900/80 px-3 py-2">
+            <span className="text-3xl font-black">
               {movie.vote_count > 0 ? movie.vote_average.toFixed(1) : 'N/A'}
             </span>
             <span className="text-xs text-zinc-500">
@@ -245,7 +258,7 @@ function MovieHero({
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-3">
             <button
-              className="rounded-xl bg-blue-600 px-5 py-3 text-xs font-extrabold text-white shadow-lg shadow-blue-950/30 transition hover:bg-blue-500"
+              className="rounded-lg bg-blue-600 px-5 py-3 text-xs font-extrabold text-white shadow-lg shadow-blue-950/30 transition hover:bg-blue-500"
               onClick={onEditList}
               type="button"
             >
@@ -341,18 +354,40 @@ function TrailerSection({ movie }: { movie: MovieDetail }) {
 
 function CommunityRating({ movie }: { movie: MovieDetail }) {
   const score = Math.min(10, Math.max(0, movie.vote_average))
+  const distribution = movie.rating_distribution?.length === 10
+    ? movie.rating_distribution
+    : Array.from({ length: 10 }, () => 0)
+  const chartData = distribution.map((frequency, index) => ({
+    rating: index + 1,
+    frequency,
+  }))
   return (
     <section className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 sm:p-6">
-      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-400">App community score</p>
+      <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">App community score</p>
       <div className="mt-1 flex items-end justify-between gap-4">
         <h2 className="text-2xl font-extrabold text-white">User rating</h2>
         <p><span className="text-3xl font-black text-white">{movie.vote_count > 0 ? score.toFixed(1) : 'N/A'}</span>{movie.vote_count > 0 ? <span className="text-sm text-zinc-500"> / 10</span> : null}</p>
       </div>
-      <div className="relative mt-6 h-5 overflow-hidden rounded-full bg-zinc-800">
-        <div className={`h-full rounded-full ${score >= 5 ? 'bg-emerald-500' : 'bg-red-500'}`} style={{ width: `${score * 10}%` }} />
-        <div className="absolute bottom-0 left-1/2 top-0 w-0.5 bg-red-400" title="5/10 midpoint" />
+      <div className="mt-6 rounded-xl bg-zinc-950/40 px-3 pb-3 pt-4">
+        <div className="h-40" aria-label="Frequency of user ratings from 1 to 10">
+          <ResponsiveContainer height="100%" width="100%">
+            <BarChart data={chartData} margin={{ top: 20, right: 0, left: 0, bottom: 0 }}>
+              <CartesianGrid stroke="#27272a" strokeDasharray="3 3" vertical={false} />
+              <XAxis axisLine={false} dataKey="rating" tick={{ fill: '#71717a', fontSize: 10 }} tickLine={false} />
+              <YAxis allowDecimals={false} hide />
+              <Tooltip
+                contentStyle={{ backgroundColor: '#18181b', border: '1px solid #27272a', borderRadius: '8px', color: '#fff' }}
+                formatter={(value) => [`${value} rating${value === 1 ? '' : 's'}`, 'Frequency']}
+                labelFormatter={(label) => `${label}/10`}
+                cursor={{ fill: '#27272a', opacity: 0.35 }}
+              />
+              <Bar dataKey="frequency" fill="#3b82f6" radius={[3, 3, 0, 0]}>
+                <LabelList dataKey="frequency" fill="#a1a1aa" fontSize={10} position="top" />
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
       </div>
-      <div className="mt-2 flex justify-between text-[10px] text-zinc-600"><span>0</span><span className="text-red-400">5 midpoint</span><span>10</span></div>
       <p className="mt-4 text-xs text-zinc-500">
         {movie.vote_count > 0
           ? `Based on ${movie.vote_count.toLocaleString()} rating${movie.vote_count === 1 ? '' : 's'} from users of this app.`

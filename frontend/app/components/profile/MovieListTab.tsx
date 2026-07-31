@@ -40,7 +40,7 @@ export default function MovieListTab({ items, onEdit }: MovieListTabProps) {
         <p className="text-xs font-bold uppercase tracking-wider text-zinc-400">Entries ({items.length})</p>
         <div className="flex items-center gap-2">
           <label className="sr-only" htmlFor="movie-list-sort">Sort movie list</label>
-          <select className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-semibold text-zinc-300 outline-none focus:border-red-500/60" id="movie-list-sort" onChange={(event) => setSortBy(event.target.value as SortOption)} value={sortBy}>
+          <select className="rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-semibold text-zinc-300 outline-none" id="movie-list-sort" onChange={(event) => setSortBy(event.target.value as SortOption)} value={sortBy}>
             <option value="date">Last updated</option>
             <option value="name">Name</option>
             <option value="rating">User rating</option>
@@ -143,20 +143,24 @@ function MoviePreferenceCard({ item, onEdit }: { item: MovieListItem; onEdit: (i
 }
 
 function StatusBadge({ status }: Pick<MovieListItem, 'status'>) {
-  const color = status === 'completed' ? 'border-red-500/30 bg-red-950 text-red-300' : status === 'watching' ? 'border-emerald-500/30 bg-emerald-950 text-emerald-300' : 'border-zinc-700 bg-zinc-900 text-zinc-300'
+  const color = status === 'completed'
+    ? 'border-emerald-500/30 bg-emerald-950 text-emerald-300'
+    : status === 'watching'
+      ? 'border-yellow-500/30 bg-yellow-950 text-yellow-300'
+      : 'border-blue-500/30 bg-blue-950 text-blue-300'
   return <span className={`inline-block rounded-md border px-2 py-1 text-[9px] font-bold ${color}`}>{MOVIE_STATUS_LABELS[status]}</span>
 }
 
 function Rating({ rating, large = false }: { rating: number | null; large?: boolean }) {
-  return rating ? <span className={`${large ? 'text-2xl' : 'text-lg'} font-black tracking-tight text-red-300/75`}>{rating}<span className="ml-1 text-xs text-zinc-500">/10</span></span> : <span className="text-zinc-600">—</span>
+  return rating ? <span className={`${large ? 'text-2xl' : 'text-lg'} font-black tracking-tight`}>{rating}<span className="ml-1 text-xs text-zinc-500">/10</span></span> : <span className="text-zinc-600">—</span>
 }
 
 function EditButton({ item, onEdit }: { item: MovieListItem; onEdit: (item: MovieListItem) => void }) {
-  return <button aria-label={`Edit preferences for ${item.movie.title}`} className="rounded-lg bg-red-600 px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-white transition hover:bg-red-500" onClick={() => onEdit(item)} type="button">Edit</button>
+  return <button aria-label={`Edit preferences for ${item.movie.title}`} className="rounded-lg bg-blue-600 px-3 py-2 text-[10px] font-extrabold uppercase tracking-wider text-white transition hover:bg-blue-500" onClick={() => onEdit(item)} type="button">Edit</button>
 }
 
 function ViewButton({ active, children, label, onClick }: { active: boolean; children: ReactNode; label: string; onClick: () => void }) {
-  return <button aria-label={label} className={`rounded-lg p-1.5 transition ${active ? 'bg-red-600 text-white' : 'text-zinc-500 hover:text-zinc-200'}`} onClick={onClick} title={label} type="button">{children}</button>
+  return <button aria-label={label} className={`rounded-lg p-1.5 transition ${active ? 'bg-gray-600 text-white' : 'text-zinc-500 hover:text-zinc-200'}`} onClick={onClick} title={label} type="button">{children}</button>
 }
 
 function GridViewIcon() { return <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" strokeWidth={1.8} /></svg> }

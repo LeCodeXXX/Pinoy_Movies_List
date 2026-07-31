@@ -99,6 +99,7 @@ export interface MovieDetail {
   popularity: number
   vote_average: number
   vote_count: number
+  rating_distribution: number[]
   streaming_availability: StreamingAvailability
   similar_movies: MovieSummary[]
 }

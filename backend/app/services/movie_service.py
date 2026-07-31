@@ -210,6 +210,7 @@ class MovieService:
             popularity=data.get("popularity") or 0,
             vote_average=rating.average,
             vote_count=rating.count,
+            rating_distribution=list(rating.distribution),
             streaming_availability=self._build_availability(providers, region),
             similar_movies=[
                 self._build_summary(movie, rating_summaries)

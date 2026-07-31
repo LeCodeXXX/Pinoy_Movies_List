@@ -103,7 +103,7 @@ export default function MovieReviews({
   }
 
   return (
-    <section className="mt-6 pb-8">
+    <section className="mt-10 pb-8">
       <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">
         From movie fans
       </p>
@@ -126,8 +126,8 @@ export default function MovieReviews({
             </p>
           </div>
           {rating !== null ? (
-            <span className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3 py-1.5 text-sm font-black text-amber-300">
-              &#9733; {rating} / 10
+            <span className="rounded-lg border border-blue-500/20 bg-blue-500/10 px-3 py-1.5 text-sm font-black text-blue-300">
+              {rating} / 10
             </span>
           ) : null}
         </div>
@@ -143,8 +143,8 @@ export default function MovieReviews({
                 aria-pressed={rating === score}
                 className={`rounded-xl border px-2 py-2.5 text-xs font-black transition ${
                   rating === score
-                    ? 'border-amber-400 bg-amber-400 text-zinc-950'
-                    : 'border-zinc-700 bg-zinc-950 text-zinc-400 hover:border-amber-500/60 hover:text-amber-300'
+                    ? 'border-blue-400 bg-blue-400 text-zinc-950'
+                    : 'border-zinc-700 bg-zinc-950 text-zinc-400 hover:border-blue-500/60 hover:text-blue-300'
                 }`}
                 key={score}
                 onClick={() => {
@@ -225,22 +225,22 @@ function ReviewCard({ review }: { review: MovieReview }) {
   const authorName = review.author.display_name || review.author.username
 
   return (
-    <article className="rounded-2xl border border-zinc-800 bg-zinc-900/70 p-5">
+    <article className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
       <div className="flex items-start justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-red-500/10 text-xs font-black text-red-300">
+        <div className="flex min-w-0 items-center gap-2.5">
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-500/10 text-[10px] font-black text-blue-300">
             {getInitials(authorName)}
           </div>
           <div className="min-w-0">
-            <p className="truncate text-sm font-bold text-zinc-200">{authorName}</p>
+            <p className="truncate text-xs font-bold text-zinc-200">{authorName}</p>
             <p className="mt-0.5 text-[10px] text-zinc-600">{reviewDate}</p>
           </div>
         </div>
-        <span className="shrink-0 rounded-lg border border-amber-500/20 bg-amber-500/10 px-2 py-1 text-xs font-black text-amber-300">
-          &#9733; {review.rating}
+        <span className="shrink-0 rounded-lg border border-blue-500/20 bg-blue-500/10 px-2 py-1 text-[11px] font-black text-blue-300">
+          {review.rating} / 10
         </span>
       </div>
-      <p className="mt-4 whitespace-pre-wrap text-xs leading-6 text-zinc-300">{review.review}</p>
+      <p className="mt-3 whitespace-pre-wrap text-[11px] leading-5 text-zinc-300">{review.review}</p>
     </article>
   )
 }

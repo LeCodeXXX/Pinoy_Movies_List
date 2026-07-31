@@ -37,11 +37,10 @@ export default function ProfileNavBar({
               <button
                 key={tab.id}
                 aria-selected={isActive}
-                className={`relative py-3.5 text-sm font-bold transition duration-200 ${
-                  isActive
-                    ? 'text-red-400'
-                    : 'text-zinc-400 hover:text-zinc-200'
-                }`}
+                className={`relative py-3.5 text-sm font-bold transition duration-200 ${isActive
+                  ? 'text-white'
+                  : 'text-zinc-400 hover:text-zinc-200'
+                  }`}
                 onClick={() => onTabChange(tab.id)}
                 role="tab"
                 type="button"
@@ -50,7 +49,7 @@ export default function ProfileNavBar({
                 {isActive && (
                   <span
                     aria-hidden="true"
-                    className="absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-red-500 shadow-[0_0_12px_rgba(239,68,68,0.8)]"
+                    className="absolute bottom-0 left-0 h-0.5 w-full rounded-full bg-white shadow-[0_0_12px_rgba(239,68,68,0.8)]"
                   />
                 )}
               </button>
