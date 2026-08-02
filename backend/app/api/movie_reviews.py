@@ -9,7 +9,7 @@ from app.schemas.movie_review import (
     MovieReviewResponse,
     MovieReviewUpsertRequest,
 )
-from app.services.movie_review_service import movie_review_service
+from app.controllers import movie_review_controller
 
 router = APIRouter(tags=["movie reviews"])
 
@@ -18,18 +18,14 @@ router = APIRouter(tags=["movie reviews"])
 async def list_movie_reviews(
     movie_id: Annotated[int, Path(ge=1)],
 ) -> MovieReviewListResponse:
-    return MovieReviewListResponse(
-        results=await movie_review_service.list_for_movie(movie_id)
-    )
+    return await movie_review_controller.list_for_movie(movie_id)
 
 
 @router.get("/users/{user_id}/reviews", response_model=MovieReviewListResponse)
 async def list_user_reviews(
     user_id: Annotated[str, Path(min_length=1)],
 ) -> MovieReviewListResponse:
-    return MovieReviewListResponse(
-        results=await movie_review_service.list_for_user(user_id)
-    )
+    return await movie_review_controller.list_for_user(user_id)
 
 
 @router.get(
@@ -40,7 +36,7 @@ async def get_user_movie_review(
     user_id: Annotated[str, Path(min_length=1)],
     movie_id: Annotated[int, Path(ge=1)],
 ) -> MovieReviewResponse:
-    return await movie_review_service.get(user_id, movie_id)
+    return await movie_review_controller.get(user_id, movie_id)
 
 
 @router.put(
@@ -52,4 +48,4 @@ async def upsert_user_movie_review(
     movie_id: Annotated[int, Path(ge=1)],
     data: MovieReviewUpsertRequest,
 ) -> MovieReviewResponse:
-    return await movie_review_service.upsert(user_id, movie_id, data)
+    return await movie_review_controller.upsert(user_id, movie_id, data)

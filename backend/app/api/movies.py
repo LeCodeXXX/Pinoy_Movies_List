@@ -7,8 +7,7 @@ from fastapi import APIRouter, Path, Query
 from app.core.config import settings
 from app.schemas.movie import MovieDetailResponse, MovieListResponse
 from app.schemas.movie_ranking import MovieRankingResponse
-from app.services.movie_ranking_service import movie_ranking_service
-from app.services.movie_service import movie_service
+from app.controllers import movie_controller
 
 router = APIRouter(prefix="/movies", tags=["movies"])
 
@@ -17,7 +16,7 @@ router = APIRouter(prefix="/movies", tags=["movies"])
 async def get_movie_rankings(
     limit: Annotated[int, Query(ge=1, le=50)] = 10,
 ) -> MovieRankingResponse:
-    return await movie_ranking_service.get_rankings(limit)
+    return await movie_controller.get_rankings(limit)
 
 
 @router.get("", response_model=MovieListResponse)
@@ -34,13 +33,7 @@ async def discover_movies(
         "vote_count.desc",
     ] = "popularity.desc",
 ) -> MovieListResponse:
-    return await movie_service.discover_philippine_movies(
-        page,
-        language,
-        sort_by,
-        genre_id=genre_id,
-        page_size=page_size,
-    )
+    return await movie_controller.discover(page, language, sort_by, genre_id, page_size)
 
 
 @router.get("/search", response_model=MovieListResponse)
@@ -49,7 +42,7 @@ async def search_movies(
     page: Annotated[int, Query(ge=1, le=500)] = 1,
     language: Annotated[str, Query(min_length=2, max_length=10)] = settings.tmdb_default_language,
 ) -> MovieListResponse:
-    return await movie_service.search_movies(query.strip(), page, language)
+    return await movie_controller.search(query, page, language)
 
 
 @router.get("/{movie_id}", response_model=MovieDetailResponse)
@@ -58,4 +51,4 @@ async def get_movie(
     language: Annotated[str, Query(min_length=2, max_length=10)] = settings.tmdb_default_language,
     region: Annotated[str, Query(min_length=2, max_length=2)] = settings.tmdb_default_region,
 ) -> MovieDetailResponse:
-    return await movie_service.get_movie(movie_id, language, region.upper())
+    return await movie_controller.get_movie(movie_id, language, region)
