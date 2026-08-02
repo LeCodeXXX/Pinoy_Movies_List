@@ -2,7 +2,7 @@ import type { CreditMoviesResponse } from '../types/people'
 import api from '../utils/api'
 
 async function getCreditMovies(path: string, page: number, signal?: AbortSignal) {
-  const params = new URLSearchParams({ page: String(page), page_size: '6', language: 'en-US' })
+  const params = new URLSearchParams({ page: String(page), page_size: '12', language: 'en-US' })
   const response = await api(`${path}?${params}`, 'GET', { signal })
   if (!response.ok) {
     const body = (await response.json().catch(() => null)) as { detail?: string } | null
