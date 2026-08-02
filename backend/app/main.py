@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.api.auth import router as auth_router
+from app.api.credits import router as credits_router
 from app.api.movie_preferences import router as movie_preferences_router
 from app.api.movie_reviews import router as movie_reviews_router
 from app.api.movies import router as movies_router
@@ -36,6 +37,7 @@ app.add_middleware(
 
 app.include_router(auth_router, prefix="/api")
 app.include_router(movies_router, prefix="/api")
+app.include_router(credits_router, prefix="/api")
 app.include_router(movie_preferences_router, prefix="/api")
 app.include_router(movie_reviews_router, prefix="/api")
 

@@ -144,18 +144,20 @@ export default function MovieDetails() {
             <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 sm:p-6">
               <h2 className="text-lg font-extrabold text-white">Production</h2>
               <div className="mt-4 grid gap-5 sm:grid-cols-2">
-                <DetailBlock
-                  label="Director"
-                  values={movie.director ? [movie.director.name] : []}
-                />
+                <div>
+                  <h3 className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Director</h3>
+                  {movie.director ? <Link className="mt-1 block text-sm leading-6 text-zinc-300 hover:text-blue-400" href={`/people/${movie.director.id}`}>{movie.director.name}</Link> : <p className="mt-1 text-sm leading-6 text-zinc-300">Not provided</p>}
+                </div>
                 <DetailBlock
                   label="Writers"
                   values={movie.writers.map((writer) => writer.name)}
                 />
-                <DetailBlock
-                  label="Production companies"
-                  values={movie.production_companies.map((company) => company.name)}
-                />
+                <div>
+                  <h3 className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">Production companies</h3>
+                  <div className="mt-1 flex flex-col items-start gap-1 text-sm leading-6 text-zinc-300">
+                    {movie.production_companies.length ? movie.production_companies.map((company) => <Link key={company.id} className="hover:text-blue-400" href={`/companies/${company.id}`}>{company.name}</Link>) : <span>Not provided</span>}
+                  </div>
+                </div>
                 <DetailBlock
                   label="Spoken languages"
                   values={movie.spoken_languages.map((language) => language.name)}
@@ -287,7 +289,7 @@ function CastSection({ movie }: { movie: MovieDetail }) {
               {member.profile_url ? <Image alt="" className="object-cover" fill sizes="44px" src={member.profile_url} /> : null}
             </div>
             <div className="min-w-0">
-              <h3 className="truncate text-sm font-bold text-zinc-200">{member.name}</h3>
+            <Link className="truncate text-sm font-bold text-zinc-200 hover:text-blue-400" href={`/people/${member.id}`}>{member.name}</Link>
               <p className="mt-0.5 truncate text-[11px] text-zinc-500">{member.character || 'Cast member'}</p>
             </div>
           </article>
