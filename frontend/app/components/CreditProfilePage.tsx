@@ -58,15 +58,13 @@ export default function CreditProfilePage({ kind }: { kind: 'person' | 'company'
     <main className="min-h-screen bg-zinc-950 px-4 py-5 text-zinc-100 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         <BackToMovies />
-        <section className="mt-6 flex flex-col gap-5 rounded-3xl border border-zinc-800 bg-zinc-900/70 p-5 sm:flex-row sm:items-center sm:p-8">
-          <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-2xl bg-zinc-800 sm:h-36 sm:w-36">
-            {profile.image_url ? <Image alt={`${profile.name} image`} className="object-cover" fill sizes="144px" src={profile.image_url} /> : null}
+        <section className="relative mt-28 rounded-3xl border border-zinc-800 bg-zinc-900/70 px-5 pb-7 pt-24 text-center sm:px-8 sm:pb-9 sm:pt-28">
+          <div className="absolute -top-24 left-1/2 h-48 w-48 -translate-x-1/2 overflow-hidden rounded-3xl border-8 border-zinc-950 bg-zinc-800 shadow-2xl shadow-black/50 sm:-top-28 sm:h-56 sm:w-56">
+            {profile.image_url ? <Image alt={`${profile.name} image`} className="object-cover" fill sizes="224px" src={profile.image_url} /> : null}
           </div>
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">{profile.role ?? (kind === 'person' ? 'Film profile' : 'Production company')}</p>
-            <h1 className="mt-2 text-3xl font-black text-white sm:text-5xl">{profile.name}</h1>
-            {profile.description ? <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-400">{profile.description}</p> : null}
-          </div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">{profile.role ?? (kind === 'person' ? 'Film profile' : 'Production company')}</p>
+          <h1 className="mt-2 text-3xl font-black text-white sm:text-5xl">{profile.name}</h1>
+          {profile.description ? <p className="mx-auto mt-3 max-w-3xl text-sm leading-7 text-zinc-400">{profile.description}</p> : null}
         </section>
 
         <section className="mt-8 pb-12">
