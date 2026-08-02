@@ -38,8 +38,9 @@ class MovieRatingRepository:
         distributions: dict[int, list[int]] = {}
         for result in results:
             movie_id = int(result["_id"]["movie_id"])
-            rating = int(result["_id"]["rating"])
-            distributions.setdefault(movie_id, [0] * 10)[rating - 1] = int(result["count"])
+            rating = int(round(float(result["_id"]["rating"])))
+            if 1 <= rating <= 10:
+                distributions.setdefault(movie_id, [0] * 10)[rating - 1] = int(result["count"])
 
         return {
             movie_id: MovieRatingSummary(

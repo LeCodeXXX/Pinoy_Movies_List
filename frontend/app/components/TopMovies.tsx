@@ -24,17 +24,17 @@ const categoryDetails: Record<
   popular: {
     label: 'Most Popular',
     shortLabel: 'Popular',
-    description: 'Trending Philippine movies ranked by TMDB popularity.',
+    description: 'Movies ranked by activity in this app.',
   },
   rated: {
     label: 'Best Rated',
     shortLabel: 'Top Rated',
-    description: 'Highest-rated Philippine movies from TMDB viewers.',
+    description: 'Highest-rated movies from app users.',
   },
   voted: {
     label: 'Most Voted',
     shortLabel: 'Most Voted',
-    description: 'Philippine movies with the most TMDB viewer votes.',
+    description: 'Movies with the most ratings from app users.',
   },
 }
 
@@ -66,11 +66,10 @@ export default function TopMovies({
                 key={category}
                 aria-controls="movie-ranking-panel"
                 aria-selected={isActive}
-                className={`flex min-w-0 items-center justify-center gap-1 rounded-md px-1 py-1.5 text-[9px] font-semibold transition ${
-                  isActive
+                className={`flex min-w-0 items-center justify-center gap-1 rounded-md px-1 py-1.5 text-[9px] font-semibold transition ${isActive
                     ? 'bg-red-600 text-white shadow-md shadow-red-950/40'
                     : 'text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200'
-                }`}
+                  }`}
                 id={`movie-ranking-tab-${category}`}
                 onClick={() => setActiveCategory(category)}
                 role="tab"
@@ -122,8 +121,7 @@ export default function TopMovies({
         )}
 
         <div className="mx-2 mt-3 flex items-center justify-center gap-1.5 border-t border-zinc-800 pt-3 text-[9px] font-medium uppercase tracking-wider text-zinc-600">
-          <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-          Live data from TMDB
+          Based on app data
         </div>
       </div>
     </section>
@@ -155,9 +153,8 @@ function RankingMovie({
         href={`/movies/${movie.id}`}
       >
         <span
-          className={`w-4 shrink-0 text-center text-sm font-black ${
-            rank === 1 ? 'text-red-400' : 'text-zinc-600'
-          }`}
+          className={`w-4 shrink-0 text-center text-sm font-black ${rank === 1 ? 'text-red-400' : 'text-zinc-600'
+            }`}
         >
           {rank}
         </span>

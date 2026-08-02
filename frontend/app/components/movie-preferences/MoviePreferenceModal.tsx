@@ -111,7 +111,7 @@ export default function MoviePreferenceModal({
             <span className="mb-1.5 block text-xs font-bold text-zinc-300">Your rating</span>
             <select className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-3 text-sm font-semibold text-white outline-none focus:border-blue-500" onChange={(event) => setRating(event.target.value)} value={rating}>
               <option value="">Not rated</option>
-              {Array.from({ length: 10 }, (_, index) => index + 1).map((score) => (
+              {Array.from({ length: 19 }, (_, index) => (index + 2) / 2).map((score) => (
                 <option key={score} value={score}>{score} / 10</option>
               ))}
             </select>

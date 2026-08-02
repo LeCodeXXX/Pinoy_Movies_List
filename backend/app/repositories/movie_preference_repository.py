@@ -23,7 +23,7 @@ class MoviePreferenceRepository:
         user_id: str,
         movie: MovieSnapshot,
         status: str,
-        rating: int | None,
+        rating: float | None,
         is_favorite: bool,
     ) -> MoviePreference:
         preference = MoviePreference(
@@ -42,7 +42,7 @@ class MoviePreferenceRepository:
         preference: MoviePreference,
         *,
         status: str,
-        rating: int | None,
+        rating: float | None,
         is_favorite: bool,
     ) -> MoviePreference:
         preference.status = status

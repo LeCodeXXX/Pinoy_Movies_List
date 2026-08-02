@@ -6,9 +6,18 @@ from fastapi import APIRouter, Path, Query
 
 from app.core.config import settings
 from app.schemas.movie import MovieDetailResponse, MovieListResponse
+from app.schemas.movie_ranking import MovieRankingResponse
+from app.services.movie_ranking_service import movie_ranking_service
 from app.services.movie_service import movie_service
 
 router = APIRouter(prefix="/movies", tags=["movies"])
+
+
+@router.get("/rankings", response_model=MovieRankingResponse)
+async def get_movie_rankings(
+    limit: Annotated[int, Query(ge=1, le=50)] = 10,
+) -> MovieRankingResponse:
+    return await movie_ranking_service.get_rankings(limit)
 
 
 @router.get("", response_model=MovieListResponse)

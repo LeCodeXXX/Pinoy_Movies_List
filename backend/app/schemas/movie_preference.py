@@ -16,7 +16,7 @@ class MovieListStatus(str, Enum):
 
 class MoviePreferenceUpsertRequest(BaseModel):
     status: MovieListStatus
-    rating: int | None = Field(default=None, ge=1, le=10)
+    rating: float | None = Field(default=None, ge=1, le=10)
     is_favorite: bool = False
 
 
@@ -25,7 +25,7 @@ class MoviePreferenceResponse(BaseModel):
     user_id: str
     movie_id: int
     status: MovieListStatus
-    rating: int | None
+    rating: float | None
     is_favorite: bool
     movie: MovieSummaryResponse
     created_at: datetime

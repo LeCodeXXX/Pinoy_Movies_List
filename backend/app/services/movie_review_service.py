@@ -17,6 +17,7 @@ from app.schemas.movie_review import (
     ReviewAuthorResponse,
 )
 from app.services.movie_service import MovieService, movie_service
+from app.services.movie_statistics_service import movie_statistics_service
 
 
 class MovieReviewService:
@@ -44,6 +45,7 @@ class MovieReviewService:
         review = await self.repository.find(user_id, movie_id)
         if review is None:
             raise MovieReviewNotFoundError(movie_id)
+        await movie_statistics_service.refresh(movie_id)
         return self._build_response(review, user)
 
     async def upsert(

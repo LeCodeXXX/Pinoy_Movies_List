@@ -21,7 +21,7 @@ class MovieReviewRepository:
         *,
         user_id: str,
         movie: MovieSnapshot,
-        rating: int,
+        rating: float,
         review: str,
     ) -> Review:
         item = Review(
@@ -34,7 +34,7 @@ class MovieReviewRepository:
         await item.insert()
         return item
 
-    async def update(self, item: Review, *, rating: int, review: str) -> Review:
+    async def update(self, item: Review, *, rating: float, review: str) -> Review:
         item.rating = rating
         item.review = review
         item.updated_at = utc_now()

@@ -11,7 +11,7 @@ import {
   featuredMovieGenres,
   movieGenreNames,
 } from '@/app/constants/movieGenres'
-import { getMovies, searchMovies } from '../services/movieApi'
+import { getMovieRankings, getMovies, searchMovies } from '../services/movieApi'
 import type { MovieRankingLists, MovieSummary } from '../types/movie'
 import {
   defaultAdvancedSearchFilters,
@@ -50,8 +50,7 @@ export default function Main() {
     async function loadMovies() {
       const coreMoviesPromise = Promise.all([
         getMovies({ pageSize: 18, signal: controller.signal }),
-        getMovies({ sortBy: 'vote_average.desc', signal: controller.signal }),
-        getMovies({ sortBy: 'vote_count.desc', signal: controller.signal }),
+        getMovieRankings(controller.signal),
       ])
         .then((responses) => ({ error: null, responses }))
         .catch((error: unknown) => ({ error, responses: null }))
@@ -78,13 +77,9 @@ export default function Main() {
       if (controller.signal.aborted) return
 
       if (coreResult.responses) {
-        const [popular, rated, voted] = coreResult.responses
+        const [popular, appRankings] = coreResult.responses
         setPopularMovies(popular.results)
-        setRankings({
-          popular: popular.results,
-          rated: rated.results,
-          voted: voted.results,
-        })
+        setRankings(appRankings)
         setMovieError(null)
         setRankingError(null)
       } else {

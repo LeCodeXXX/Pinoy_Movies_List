@@ -15,6 +15,7 @@ from app.schemas.movie_preference import (
     MoviePreferenceUpsertRequest,
 )
 from app.services.movie_service import MovieService, movie_service
+from app.services.movie_statistics_service import movie_statistics_service
 
 
 class MoviePreferenceService:
@@ -38,6 +39,7 @@ class MoviePreferenceService:
         preference = await self.repository.find(user_id, movie_id)
         if preference is None:
             raise MoviePreferenceNotFoundError(movie_id)
+        await movie_statistics_service.refresh(movie_id)
         return self._build_response(preference)
 
     async def upsert(

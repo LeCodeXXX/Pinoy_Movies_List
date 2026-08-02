@@ -34,7 +34,7 @@ class WatchHistory(MovieInteraction):
 
 
 class Rating(MovieInteraction):
-    rating: int = Field(ge=1, le=10)
+    rating: float = Field(ge=1, le=10)
     rated_at: datetime = Field(default_factory=utc_now)
 
     class Settings(MovieInteraction.Settings):
@@ -59,7 +59,7 @@ class MovieSnapshot(BaseModel):
 class Review(MovieInteraction):
     """A user's single review, including the rating and renderable movie data."""
 
-    rating: int = Field(ge=1, le=10)
+    rating: float = Field(ge=1, le=10)
     review: str = Field(min_length=1, max_length=5_000)
     movie: MovieSnapshot
     created_at: datetime = Field(default_factory=utc_now)
@@ -78,7 +78,7 @@ class MoviePreference(MovieInteraction):
     """A user's single source of truth for one entry in their movie list."""
 
     status: str
-    rating: int | None = Field(default=None, ge=1, le=10)
+    rating: float | None = Field(default=None, ge=1, le=10)
     is_favorite: bool = False
     movie: MovieSnapshot
     created_at: datetime = Field(default_factory=utc_now)

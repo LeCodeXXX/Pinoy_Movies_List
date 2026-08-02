@@ -1,4 +1,4 @@
-import type { MovieDetail, MovieListResponse } from '../types/movie'
+import type { MovieDetail, MovieListResponse, MovieRankingLists } from '../types/movie'
 import api from '../utils/api'
 
 export type MovieSort =
@@ -67,6 +67,11 @@ export async function getMovie(movieId: number, signal?: AbortSignal) {
     ...movie,
     similar_movies: uniqueMoviesById(movie.similar_movies),
   }
+}
+
+export async function getMovieRankings(signal?: AbortSignal) {
+  const response = await api('/api/movies/rankings?limit=10', 'GET', { signal })
+  return (await parseResponse<MovieRankingLists>(response))
 }
 
 function deduplicateMovieList(response: MovieListResponse): MovieListResponse {

@@ -8,7 +8,7 @@ from app.schemas.movie import MovieSummaryResponse
 
 
 class MovieReviewUpsertRequest(BaseModel):
-    rating: int = Field(ge=1, le=10)
+    rating: float = Field(ge=1, le=10)
     review: str = Field(min_length=1, max_length=5_000)
 
     @field_validator("review")
@@ -31,7 +31,7 @@ class MovieReviewResponse(BaseModel):
     id: str
     user_id: str
     movie_id: int
-    rating: int
+    rating: float
     review: str
     movie: MovieSummaryResponse
     author: ReviewAuthorResponse
