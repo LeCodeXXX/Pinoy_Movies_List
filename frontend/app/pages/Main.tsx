@@ -157,8 +157,9 @@ export default function Main() {
               onClearFilters={clearMovieSearch}
             />
           </div>
-          <aside className="mx-auto w-full max-w-xl px-3 py-6 sm:px-6 lg:mx-0 lg:max-w-none lg:justify-self-end lg:px-0">
+          <aside className="order-last mt-4 h-[420px] w-full max-w-none px-0 py-0 lg:order-none lg:mx-0 lg:mt-0 lg:h-auto lg:px-0 lg:py-2 lg:justify-self-end">
             <TopMovies
+              className="mx-2 h-full lg:mx-0"
               error={rankingError}
               isLoading={rankingsQuery.isPending}
               rankings={rankings}

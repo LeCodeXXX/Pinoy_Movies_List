@@ -41,12 +41,12 @@ export default function SearchMovies({
 
   return (
     <header className="sticky top-0 z-[100] w-full border-b border-zinc-800/90 bg-zinc-900/95 shadow-xl shadow-black/30 backdrop-blur-md">
-      <div className="mx-auto flex w-full max-w-[1600px] flex-wrap items-center gap-3 px-4 py-3 sm:px-6 lg:flex-nowrap lg:px-8">
+      <div className="mx-auto flex w-full max-w-[1600px] flex-wrap items-center gap-3 px-4 py-3 sm:px-6 lg:flex-nowrap lg:gap-4 lg:px-8">
         <div className="min-w-0 flex-1 lg:w-56 lg:flex-none lg:shrink-0">
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">
             Pinoy Cinema Vault
           </p>
-          <h1 className="mt-0.5 text-lg font-extrabold tracking-tight text-white">
+          <h1 className="mt-0.5 text-xl font-extrabold tracking-tight text-white sm:text-2xl">
             Discover Filipino cinema
           </h1>
         </div>
@@ -103,7 +103,7 @@ export default function SearchMovies({
           <button
             aria-controls="advanced-movie-search"
             aria-expanded={isAdvancedOpen}
-            className={'inline-flex items-center justify-center gap-2 rounded-xl border px-3.5 py-2.5 text-xs font-semibold transition border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700 hover:text-white'}
+            className={'inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border px-3.5 py-2.5 text-xs font-semibold transition border-zinc-800 bg-zinc-900 text-zinc-400 hover:border-zinc-700 hover:text-white'}
             onClick={() => setIsAdvancedOpen((current) => !current)}
             type="button"
           >

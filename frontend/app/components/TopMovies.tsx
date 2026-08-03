@@ -10,6 +10,7 @@ import type {
 } from '../types/movie'
 
 interface TopMoviesProps {
+  className?: string
   error: string | null
   isLoading: boolean
   rankings: MovieRankingLists
@@ -39,6 +40,7 @@ const categoryDetails: Record<
 }
 
 export default function TopMovies({
+  className,
   error,
   isLoading,
   rankings,
@@ -49,8 +51,8 @@ export default function TopMovies({
   const movies = rankings[activeCategory].slice(0, 10)
 
   return (
-    <section className="overflow-hidden rounded-lg border border-zinc-800/90 bg-zinc-900/70 shadow-xl shadow-black/20">
-      <div className="border-b border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-950 p-3">
+    <section className={`${className ?? ''} flex flex-col overflow-hidden rounded-lg border border-zinc-800/90 bg-zinc-900/70 shadow-xl shadow-black/20`}>
+      <div className="border-b border-zinc-800 bg-gradient-to-br from-zinc-900 to-zinc-950 p-4">
         <h2 className="text-xl font-extrabold tracking-tight text-white">
           Top Movies
         </h2>
@@ -88,7 +90,7 @@ export default function TopMovies({
 
       <div
         aria-labelledby={`movie-ranking-tab-${activeCategory}`}
-        className="p-3"
+        className="min-h-0 flex-1 overflow-y-auto p-4"
         id="movie-ranking-panel"
         role="tabpanel"
       >

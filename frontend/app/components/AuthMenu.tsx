@@ -15,6 +15,7 @@ export default function AuthMenu() {
   const [user, setUser] = useState<AuthUser | null>(null)
   const [mode, setMode] = useState<AuthMode>('login')
   const [isOpen, setIsOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -61,6 +62,7 @@ export default function AuthMenu() {
     window.localStorage.removeItem(AUTH_USER_STORAGE_KEY)
     window.localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY)
     setUser(null)
+    setIsUserMenuOpen(false)
   }
 
   const switchMode = (nextMode: AuthMode) => {
@@ -113,11 +115,13 @@ export default function AuthMenu() {
     <>
       <div className="order-2 ml-auto flex shrink-0 items-center gap-2 border-l border-zinc-800 pl-3 lg:order-none lg:ml-0">
         {user ? (
-          <>
-            <Link
+          <div className="relative">
+            <button
+              aria-expanded={isUserMenuOpen}
+              aria-haspopup="menu"
               className="flex items-center gap-2.5 rounded-xl p-1 transition hover:bg-zinc-800/60"
-              href="/profile"
-              title="View Profile"
+              onClick={() => setIsUserMenuOpen((current) => !current)}
+              type="button"
             >
               <div className="hidden max-w-28 text-right sm:block">
                 <p className="truncate text-xs font-bold text-zinc-200">
@@ -141,15 +145,31 @@ export default function AuthMenu() {
                   {getInitials(user.display_name)}
                 </span>
               )}
-            </Link>
-            <button
-              className="rounded-lg border border-zinc-800 px-2.5 py-2 text-[11px] font-semibold text-zinc-400 transition hover:border-zinc-700 hover:text-white"
-              onClick={logout}
-              type="button"
-            >
-              Log out
             </button>
-          </>
+            {isUserMenuOpen ? (
+              <div
+                className="absolute right-0 top-full z-50 mt-2 w-40 rounded-xl border border-zinc-800 bg-zinc-900 p-1.5 shadow-2xl shadow-black/50"
+                role="menu"
+              >
+                <Link
+                  className="block rounded-lg px-3 py-2 text-xs font-semibold text-zinc-300 transition hover:bg-zinc-800 hover:text-white"
+                  href="/profile"
+                  onClick={() => setIsUserMenuOpen(false)}
+                  role="menuitem"
+                >
+                  View Profile
+                </Link>
+                <button
+                  className="block w-full rounded-lg px-3 py-2 text-left text-xs font-semibold text-zinc-400 transition hover:bg-zinc-800 hover:text-white"
+                  onClick={logout}
+                  role="menuitem"
+                  type="button"
+                >
+                  Log out
+                </button>
+              </div>
+            ) : null}
+          </div>
         ) : (
 
           <button
