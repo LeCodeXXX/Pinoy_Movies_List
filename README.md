@@ -95,7 +95,7 @@ docker rm -f pinoy-movies-redis
 cd backend
 Copy-Item .env.example .env
 python -m venv .venv
-.\.venv\Scripts\Activate.ps1
+.venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
@@ -138,7 +138,7 @@ Variable reference:
 Start the API:
 
 ```
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+python -m uvicorn app.main:app --reload
 ```
 
 API documentation: http://127.0.0.1:8000/docs
@@ -172,13 +172,13 @@ Open http://localhost:3000.
 Start the backend:
 
 ```
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+python -m uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
 Start the frontend:
 
 ```
-npm run dev -- --hostname 0.0.0.0
+npm run dev
 ```
 
 For a host computer with LAN IP 192.168.1.9, use this in **frontend/.env.local**:
@@ -189,7 +189,7 @@ NEXT_PUBLIC_API_BASE_URL=http://192.168.1.9:8000
 
 The backend CORS configuration must allow http://192.168.1.9:3000. Use the actual IPv4 address, keep devices on the same network, and allow the ports through the firewall.
 
-## Validation and production
+## Validation and production deployment
 
 ```
 cd frontend
