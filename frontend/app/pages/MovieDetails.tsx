@@ -130,7 +130,7 @@ export default function MovieDetails() {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="space-y-6">
-            <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 sm:p-6">
+            <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 sm:rounded-2xl sm:p-6">
               <h2 className="text-xl font-extrabold text-white">Overview</h2>
               <p className="mt-3 text-sm leading-7 text-zinc-300">
                 {movie.synopsis || 'TMDB does not have a synopsis for this movie.'}
@@ -141,7 +141,7 @@ export default function MovieDetails() {
 
             <TrailerSection movie={movie} />
 
-            <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 sm:p-6">
+            <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 sm:rounded-2xl sm:p-6">
               <h2 className="text-lg font-extrabold text-white">Production</h2>
               <div className="mt-4 grid gap-5 sm:grid-cols-2">
                 <div>
@@ -166,7 +166,7 @@ export default function MovieDetails() {
             </section>
           </div>
 
-          <aside className="h-fit rounded-2xl border border-zinc-800 bg-zinc-900/70 p-5 shadow-xl shadow-black/20">
+          <aside className="h-fit rounded-lg border border-zinc-800 bg-zinc-900/70 p-4 shadow-xl shadow-black/20 sm:rounded-2xl sm:p-5">
             <h2 className="text-base font-extrabold text-white">Movie information</h2>
             <dl className="mt-4 divide-y divide-zinc-800">
               <DetailRow label="Release date" value={releaseDate} />
@@ -226,13 +226,13 @@ function MovieHero({
   onEditList: () => void
 }) {
   return (
-    <section className="relative overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900 shadow-2xl shadow-black/40">
+    <section className="relative overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 shadow-2xl shadow-black/40 sm:rounded-3xl">
       {movie.backdrop_url ? (
         <Image alt="" className="object-cover opacity-25" fill priority sizes="100vw" src={movie.backdrop_url} />
       ) : null}
       <div className="absolute inset-0 bg-gradient-to-r from-zinc-950 via-zinc-950/90 to-zinc-950/45" />
-      <div className="relative grid gap-6 p-5 sm:p-8 md:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 lg:p-10">
-        <div className="relative mx-auto aspect-[2/3] w-full max-w-[220px] overflow-hidden rounded-2xl border border-white/10 bg-zinc-800 shadow-2xl md:mx-0">
+        <div className="relative grid gap-6 p-4 sm:p-8 md:grid-cols-[220px_minmax(0,1fr)] lg:gap-10 lg:p-10">
+        <div className="relative mx-auto aspect-[2/3] w-full max-w-[220px] overflow-hidden rounded-xl border border-white/10 bg-zinc-800 shadow-2xl sm:rounded-2xl md:mx-0">
           {movie.poster_url ? (
             <Image alt={`${movie.title} poster`} className="object-cover" fill priority sizes="220px" src={movie.poster_url} />
           ) : null}
@@ -280,7 +280,7 @@ function MovieHero({
 
 function CastSection({ movie }: { movie: MovieDetail }) {
   return (
-    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 sm:p-6">
+    <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 sm:rounded-2xl sm:p-6">
       <h2 className="text-xl font-extrabold text-white">Top cast</h2>
       <div className="mt-5 grid gap-3 sm:grid-cols-2">
         {movie.cast.slice(0, 8).map((member) => (
@@ -306,7 +306,7 @@ function TrailerSection({ movie }: { movie: MovieDetail }) {
   const thumbnailUrl = `https://i.ytimg.com/vi/${encodeURIComponent(trailer.youtube_key)}/hqdefault.jpg`
 
   return (
-    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 sm:p-6">
+    <section className="rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 sm:rounded-2xl sm:p-6">
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
           <h2 className="mt-1 text-xl font-extrabold text-white">Trailer</h2>
@@ -318,7 +318,7 @@ function TrailerSection({ movie }: { movie: MovieDetail }) {
 
       <a
         aria-label={`Watch ${trailer.name} for ${movie.title} on YouTube`}
-        className="group relative block aspect-video overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950 shadow-xl shadow-black/30 transition hover:border-red-500/60"
+        className="group relative block aspect-video overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950 shadow-xl shadow-black/30 transition hover:border-red-500/60 sm:rounded-2xl"
         href={trailer.url}
         rel="noreferrer"
         target="_blank"
@@ -364,7 +364,7 @@ function CommunityRating({ movie }: { movie: MovieDetail }) {
     frequency,
   }))
   return (
-    <section className="mt-6 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 sm:p-6">
+    <section className="mt-6 rounded-lg border border-zinc-800 bg-zinc-900/60 p-4 sm:rounded-2xl sm:p-6">
       <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">App community score</p>
       <div className="mt-1 flex items-end justify-between gap-4">
         <h2 className="text-2xl font-extrabold text-white">User rating</h2>

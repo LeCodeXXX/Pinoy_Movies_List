@@ -1,5 +1,4 @@
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://127.0.0.1:8000'
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 export const AUTH_TOKEN_STORAGE_KEY = 'pinoy-cinema-access-token'
 
 //Custome fetch function to make API calls

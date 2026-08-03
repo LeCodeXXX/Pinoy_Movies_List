@@ -18,6 +18,8 @@ from app.middleware.rate_limiter import GlobalRateLimitMiddleware, limiter
 from app.middleware.jwt_auth import JWTAuthenticationMiddleware
 from app.services.tmdb_client import tmdb_client
 
+from app.core.config import settings
+
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -40,7 +42,7 @@ app.add_middleware(GlobalRateLimitMiddleware)
 app.add_middleware(JWTAuthenticationMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=[settings.frontend_url],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     redis_key_prefix: str = "pinoy-movies-list"
     redis_cache_ttl_seconds: int = Field(default=300, ge=1)
     redis_connect_timeout_seconds: float = Field(default=1.0, gt=0)
+    frontend_url: str
 
     model_config = SettingsConfigDict(
         env_file=".env",
