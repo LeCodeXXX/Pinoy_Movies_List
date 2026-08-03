@@ -5,7 +5,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
-from slowapi.middleware import SlowAPIMiddleware
 
 from app.api.auth import router as auth_router
 from app.api.credits import router as credits_router
@@ -15,7 +14,7 @@ from app.api.movies import router as movies_router
 from app.core.cache import redis_cache
 from app.core.database import database
 from app.core.exceptions import ApplicationError
-from app.middleware.rate_limiter import limiter
+from app.middleware.rate_limiter import GlobalRateLimitMiddleware, limiter
 from app.middleware.jwt_auth import JWTAuthenticationMiddleware
 from app.services.tmdb_client import tmdb_client
 
@@ -37,7 +36,7 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS configuration (change as the project grows)
-app.add_middleware(SlowAPIMiddleware)
+app.add_middleware(GlobalRateLimitMiddleware)
 app.add_middleware(JWTAuthenticationMiddleware)
 app.add_middleware(
     CORSMiddleware,

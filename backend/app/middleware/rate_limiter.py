@@ -1,8 +1,11 @@
 """Shared SlowAPI rate-limit configuration for the API."""
 
-from fastapi import Request
-from slowapi import Limiter
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
+from starlette.middleware.base import BaseHTTPMiddleware, RequestResponseEndpoint
+from starlette.requests import Request
+from starlette.responses import Response
 
 
 GLOBAL_LIMIT = "120/minute"
@@ -37,3 +40,26 @@ login_limit = limiter.shared_limit(
     scope="login",
     key_func=get_remote_address,
 )
+
+
+class GlobalRateLimitMiddleware(BaseHTTPMiddleware):
+    """Enforce the application limit even when a route has its own limit."""
+
+    async def dispatch(
+        self,
+        request: Request,
+        call_next: RequestResponseEndpoint,
+    ) -> Response:
+        if limiter.enabled:
+            try:
+                # SlowAPI's stock middleware skips routes carrying a decorator,
+                # so its application limit is otherwise absent from most APIs.
+                limiter._check_request_limit(  # type: ignore[attr-defined]
+                    request,
+                    endpoint_func=None,
+                    in_middleware=True,
+                )
+            except RateLimitExceeded as error:
+                return _rate_limit_exceeded_handler(request, error)
+
+        return await call_next(request)

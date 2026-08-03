@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
+import { useQueries, useQuery } from '@tanstack/react-query'
 import DisplayMovies from '../components/DisplayMovies'
 import GenreSections, {
   type GenreSectionData,
@@ -24,78 +25,69 @@ const emptyRankings: MovieRankingLists = {
   voted: [],
 }
 
-const emptyGenreSections: GenreSectionData[] = featuredMovieGenres.map(
-  (genre) => ({ error: null, genre, movies: [] }),
-)
-
 export default function Main() {
   const [searchQuery, setSearchQuery] = useState('')
   const [advancedFilters, setAdvancedFilters] =
     useState<AdvancedSearchFilters>(defaultAdvancedSearchFilters)
-  const [popularMovies, setPopularMovies] = useState<MovieSummary[]>([])
   const [searchResults, setSearchResults] = useState<MovieSummary[]>([])
-  const [rankings, setRankings] = useState<MovieRankingLists>(emptyRankings)
-  const [genreSections, setGenreSections] =
-    useState<GenreSectionData[]>(emptyGenreSections)
-  const [isLoading, setIsLoading] = useState(true)
-  const [areGenresLoading, setAreGenresLoading] = useState(true)
   const [isSearching, setIsSearching] = useState(false)
-  const [movieError, setMovieError] = useState<string | null>(null)
   const [searchError, setSearchError] = useState<string | null>(null)
-  const [rankingError, setRankingError] = useState<string | null>(null)
 
-  useEffect(() => {
-    const controller = new AbortController()
+  const popularMoviesQuery = useQuery({
+    queryKey: [
+      'movies',
+      'catalog',
+      {
+        language: 'en-US',
+        page: 1,
+        pageSize: 18,
+        sortBy: 'popularity.desc',
+      },
+    ],
+    queryFn: ({ signal }) => getMovies({ pageSize: 18, signal }),
+  })
+  const rankingsQuery = useQuery({
+    queryKey: ['movies', 'rankings', { limit: 10 }],
+    queryFn: ({ signal }) => getMovieRankings(signal),
+  })
+  const genreMovieQueries = useQueries({
+    queries: featuredMovieGenres.map((genre) => ({
+      queryKey: [
+        'movies',
+        'catalog',
+        {
+          genreId: genre.id,
+          language: 'en-US',
+          page: 1,
+          pageSize: 30,
+          sortBy: 'popularity.desc',
+        },
+      ],
+      queryFn: ({ signal }: { signal: AbortSignal }) =>
+        getMovies({ genreId: genre.id, pageSize: 30, signal }),
+    })),
+  })
 
-    async function loadMovies() {
-      const coreMoviesPromise = Promise.all([
-        getMovies({ pageSize: 18, signal: controller.signal }),
-        getMovieRankings(controller.signal),
-      ])
-        .then((responses) => ({ error: null, responses }))
-        .catch((error: unknown) => ({ error, responses: null }))
-
-      const genreSectionsPromise = Promise.all(
-        featuredMovieGenres.map(async (genre): Promise<GenreSectionData> => {
-          try {
-            const response = await getMovies({
-              genreId: genre.id,
-              pageSize: 30,
-              signal: controller.signal,
-            })
-            return { error: null, genre, movies: response.results }
-          } catch (error) {
-            return { error: getErrorMessage(error), genre, movies: [] }
-          }
-        }),
-      )
-
-      const [coreResult, loadedGenreSections] = await Promise.all([
-        coreMoviesPromise,
-        genreSectionsPromise,
-      ])
-      if (controller.signal.aborted) return
-
-      if (coreResult.responses) {
-        const [popular, appRankings] = coreResult.responses
-        setPopularMovies(popular.results)
-        setRankings(appRankings)
-        setMovieError(null)
-        setRankingError(null)
-      } else {
-        const message = getErrorMessage(coreResult.error)
-        setMovieError(message)
-        setRankingError(message)
+  const popularMovies = popularMoviesQuery.data?.results ?? []
+  const rankings = rankingsQuery.data ?? emptyRankings
+  const genreSections: GenreSectionData[] = featuredMovieGenres.map(
+    (genre, index) => {
+      const query = genreMovieQueries[index]
+      return {
+        error: query.error ? getErrorMessage(query.error) : null,
+        genre,
+        movies: query.data?.results ?? [],
       }
-
-      setGenreSections(loadedGenreSections)
-      setIsLoading(false)
-      setAreGenresLoading(false)
-    }
-
-    void loadMovies()
-    return () => controller.abort()
-  }, [])
+    },
+  )
+  const isLoading = popularMoviesQuery.isPending
+  const areGenresLoading = genreMovieQueries.some((query) => query.isPending)
+  const movieError = popularMoviesQuery.error
+    ? getErrorMessage(popularMoviesQuery.error)
+    : null
+  const rankingError = rankingsQuery.error
+    ? getErrorMessage(rankingsQuery.error)
+    : null
 
   useEffect(() => {
     const normalizedQuery = searchQuery.trim()
@@ -168,7 +160,7 @@ export default function Main() {
           <aside className="mx-auto w-full max-w-xl px-3 py-6 sm:px-6 lg:mx-0 lg:max-w-none lg:justify-self-end lg:px-0">
             <TopMovies
               error={rankingError}
-              isLoading={isLoading}
+              isLoading={rankingsQuery.isPending}
               rankings={rankings}
             />
           </aside>

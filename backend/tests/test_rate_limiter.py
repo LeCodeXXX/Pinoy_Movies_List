@@ -24,7 +24,7 @@ class RateLimiterTests(unittest.TestCase):
         limiter.reset()
         self.client = TestClient(app)
 
-    def test_catalog_routes_share_one_sixty_request_bucket(self) -> None:
+    def test_catalog_routes_share_one_120_request_bucket(self) -> None:
         with (
             patch(
                 "app.controllers.movie_controller.discover",
@@ -35,14 +35,14 @@ class RateLimiterTests(unittest.TestCase):
                 new=AsyncMock(return_value=EMPTY_RANKINGS),
             ),
         ):
-            responses = [self.client.get("/api/movies") for _ in range(30)]
+            responses = [self.client.get("/api/movies") for _ in range(60)]
             responses += [
-                self.client.get("/api/movies/rankings") for _ in range(30)
+                self.client.get("/api/movies/rankings") for _ in range(60)
             ]
             blocked = self.client.get("/api/movies")
 
         self.assertTrue(all(response.status_code == 200 for response in responses))
-        self.assertEqual(responses[0].headers["X-RateLimit-Limit"], "60")
+        self.assertEqual(responses[0].headers["X-RateLimit-Limit"], "120")
         self.assertEqual(blocked.status_code, 429)
 
     def test_search_has_a_separate_ten_request_bucket(self) -> None:
@@ -71,10 +71,29 @@ class RateLimiterTests(unittest.TestCase):
         self.assertEqual(catalog_response.status_code, 200)
 
     def test_application_safety_cap_applies_across_the_app(self) -> None:
-        responses = [self.client.get("/") for _ in range(120)]
+        responses = [self.client.get("/") for _ in range(150)]
         blocked = self.client.get("/")
 
         self.assertTrue(all(response.status_code == 200 for response in responses))
+        self.assertEqual(blocked.status_code, 429)
+
+    def test_application_safety_cap_is_shared_across_route_groups(self) -> None:
+        with patch(
+            "app.controllers.movie_controller.discover",
+            new=AsyncMock(return_value=EMPTY_MOVIE_LIST),
+        ):
+            root_responses = [self.client.get("/") for _ in range(75)]
+            catalog_responses = [
+                self.client.get("/api/movies") for _ in range(75)
+            ]
+            blocked = self.client.get("/")
+
+        self.assertTrue(
+            all(response.status_code == 200 for response in root_responses)
+        )
+        self.assertTrue(
+            all(response.status_code == 200 for response in catalog_responses)
+        )
         self.assertEqual(blocked.status_code, 429)
 
     def test_authenticated_users_are_not_grouped_by_ip(self) -> None:
