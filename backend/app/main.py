@@ -12,6 +12,7 @@ from app.api.credits import router as credits_router
 from app.api.movie_preferences import router as movie_preferences_router
 from app.api.movie_reviews import router as movie_reviews_router
 from app.api.movies import router as movies_router
+from app.core.cache import redis_cache
 from app.core.database import database
 from app.core.exceptions import ApplicationError
 from app.middleware.rate_limiter import limiter
@@ -22,11 +23,13 @@ from app.services.tmdb_client import tmdb_client
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     await database.connect()
-    await tmdb_client.connect()
     try:
+        await redis_cache.connect()
+        await tmdb_client.connect()
         yield
     finally:
         await tmdb_client.disconnect()
+        await redis_cache.disconnect()
         await database.disconnect()
 
 app = FastAPI(title="Pinoy Movies List API", lifespan=lifespan)

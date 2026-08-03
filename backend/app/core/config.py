@@ -1,6 +1,6 @@
 """Application settings loaded from the backend environment."""
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -15,6 +15,10 @@ class Settings(BaseSettings):
     tmdb_default_language: str = "en-US"
     tmdb_default_region: str = "PH"
     tmdb_timeout_seconds: float = 10.0
+    redis_url: SecretStr = SecretStr("")
+    redis_key_prefix: str = "pinoy-movies-list"
+    redis_cache_ttl_seconds: int = Field(default=300, ge=1)
+    redis_connect_timeout_seconds: float = Field(default=1.0, gt=0)
 
     model_config = SettingsConfigDict(
         env_file=".env",

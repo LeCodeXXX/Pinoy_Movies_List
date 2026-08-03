@@ -71,7 +71,7 @@ class RateLimiterTests(unittest.TestCase):
         self.assertEqual(catalog_response.status_code, 200)
 
     def test_application_safety_cap_applies_across_the_app(self) -> None:
-        responses = [self.client.get("/") for _ in range(100)]
+        responses = [self.client.get("/") for _ in range(120)]
         blocked = self.client.get("/")
 
         self.assertTrue(all(response.status_code == 200 for response in responses))

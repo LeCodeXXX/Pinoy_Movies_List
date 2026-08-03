@@ -1,9 +1,12 @@
-"""Asynchronous HTTP client for the TMDB API."""
+"""Asynchronous HTTP client for the TMDB API with cache-aside Redis reads."""
 
+import hashlib
+import json
 from typing import Any
 
 import httpx
 
+from app.core.cache import RedisCache, redis_cache
 from app.core.config import settings
 from app.core.exceptions import (
     MovieNotFoundError,
@@ -16,8 +19,9 @@ from app.core.exceptions import (
 class TmdbClient:
     """Own and reuse the connection pool used for TMDB requests."""
 
-    def __init__(self) -> None:
+    def __init__(self, cache: RedisCache | None = None) -> None:
         self._client: httpx.AsyncClient | None = None
+        self._cache = cache
 
     async def connect(self) -> None:
         token = settings.tmdb_access_token.get_secret_value().strip()
@@ -44,6 +48,12 @@ class TmdbClient:
         params: dict[str, str | int | bool] | None = None,
         movie_id: int | None = None,
     ) -> dict[str, Any]:
+        cache_key = self._cache_key(path, params)
+        if self._cache is not None:
+            cached = await self._cache.get_json(cache_key)
+            if cached is not None:
+                return cached
+
         client = self._require_client()
         try:
             response = await client.get(path, params=params)
@@ -52,9 +62,34 @@ class TmdbClient:
 
         self._raise_for_status(response, movie_id)
         try:
-            return response.json()
+            data = response.json()
         except ValueError as exc:
             raise TmdbUnavailableError("TMDB returned an invalid response") from exc
+
+        if not isinstance(data, dict):
+            raise TmdbUnavailableError("TMDB returned an invalid response")
+
+        if self._cache is not None:
+            await self._cache.set_json(
+                cache_key,
+                data,
+                settings.redis_cache_ttl_seconds,
+            )
+        return data
+
+    @staticmethod
+    def _cache_key(
+        path: str,
+        params: dict[str, str | int | bool] | None,
+    ) -> str:
+        """Build the same compact key for semantically identical requests."""
+        request_identity = json.dumps(
+            {"path": path, "params": params or {}},
+            sort_keys=True,
+            separators=(",", ":"),
+        )
+        digest = hashlib.sha256(request_identity.encode("utf-8")).hexdigest()
+        return f"tmdb:{digest}"
 
     def _require_client(self) -> httpx.AsyncClient:
         if self._client is None:
@@ -71,4 +106,4 @@ class TmdbClient:
             raise TmdbUnavailableError()
 
 
-tmdb_client = TmdbClient()
+tmdb_client = TmdbClient(redis_cache)
