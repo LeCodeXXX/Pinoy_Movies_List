@@ -52,11 +52,11 @@ export default function MovieCard({
           </h3>
         </div>
 
-        <div className="absolute left-2 top-2 z-20 rounded-md border border-white/20 bg-black/60 px-2 py-1 text-[10px] font-bold text-white/80 backdrop-blur-sm sm:hidden">
+        <div className="absolute left-2 top-2 z-20 rounded-md border border-white/20 bg-black/60 px-2 py-1 text-[10px] font-bold text-white/80 backdrop-blur-sm lg:hidden">
           {rating}{hasRating ? '/10' : ''}
         </div>
 
-        <div className="absolute inset-0 z-10 hidden flex-col items-center justify-center bg-black/60 px-4 text-center opacity-0 backdrop-blur-[1px] transition duration-300 group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none sm:flex">
+        <div className="absolute inset-0 z-10 hidden flex-col items-center justify-center bg-black/60 px-4 text-center opacity-0 backdrop-blur-[1px] transition duration-300 group-hover:opacity-100 group-focus-within:opacity-100 motion-reduce:transition-none lg:flex">
           <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-zinc-400">
             Rating
           </p>
