@@ -26,13 +26,13 @@ export default function ProfileOverviewTab({
   stats,
 }: ProfileOverviewTabProps) {
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Compact capsule KPI charts */}
       <section aria-labelledby="activity-dashboard-title" className="space-y-4">
         <div className="flex items-end justify-between gap-4 border-b border-zinc-800/80 pb-2">
           <div>
             <h2
-              className="mt-1 text-lg font-extrabold text-white"
+              className="mt-1 text-base font-extrabold text-white sm:text-lg"
               id="activity-dashboard-title"
             >
               Profile snapshot
@@ -47,7 +47,7 @@ export default function ProfileOverviewTab({
         />
       </section>
 
-      <div className="pb-6">
+      <div className="pb-2 sm:pb-6">
         <ProfileStatsTab
           genreBreakdown={genreBreakdown}
           meanScore={stats.meanScore}
@@ -123,7 +123,7 @@ function StatusCapsuleChart({
   }]
 
   return (
-    <article className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-4 sm:p-5">
+          <article className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-3 sm:rounded-2xl sm:p-5">
       <div className="flex items-end justify-between gap-4">
         <div>
           <h3 className="text-sm font-bold text-zinc-200">Movie status</h3>

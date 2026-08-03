@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import { useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { MOVIE_STATUS_LABELS, type MoviePreference } from '@/app/types/moviePreference'
 
 export type ViewMode = 'grid' | 'detailed' | 'compact'
@@ -17,6 +17,21 @@ interface MovieListTabProps {
 export default function MovieListTab({ items, onEdit }: MovieListTabProps) {
   const [viewMode, setViewMode] = useState<ViewMode>('compact')
   const [sortBy, setSortBy] = useState<SortOption>('date')
+
+  useEffect(() => {
+    const mobileQuery = window.matchMedia('(max-width: 639px)')
+    const handleViewportChange = (event: MediaQueryListEvent) => {
+      if (event.matches) {
+        setViewMode((currentView) =>
+          currentView === 'compact' ? 'detailed' : currentView,
+        )
+      }
+    }
+
+    mobileQuery.addEventListener('change', handleViewportChange)
+    return () => mobileQuery.removeEventListener('change', handleViewportChange)
+  }, [])
+
   const sortedItems = useMemo(() => {
     return [...items].sort((first, second) => {
       if (sortBy === 'name') return first.movie.title.localeCompare(second.movie.title)
@@ -27,7 +42,7 @@ export default function MovieListTab({ items, onEdit }: MovieListTabProps) {
 
   if (items.length === 0) {
     return (
-      <div className="flex min-h-[300px] flex-col items-center justify-center rounded-3xl border border-dashed border-zinc-800 bg-zinc-900/30 p-8 text-center">
+      <div className="flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-900/30 p-6 text-center sm:rounded-3xl sm:p-8">
         <p className="text-sm font-bold text-white">No Movies Found</p>
         <p className="mt-1 text-xs text-zinc-500">Add a movie from its details page or adjust your filters.</p>
       </div>
@@ -35,7 +50,7 @@ export default function MovieListTab({ items, onEdit }: MovieListTabProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800/80 pb-3">
         <p className="text-xs font-bold uppercase tracking-wider text-zinc-400">Entries ({items.length})</p>
         <div className="flex items-center gap-2">
@@ -48,7 +63,9 @@ export default function MovieListTab({ items, onEdit }: MovieListTabProps) {
           <div className="flex items-center gap-1 rounded-xl border border-zinc-800 bg-zinc-900 p-1">
             <ViewButton active={viewMode === 'grid'} label="Grid view" onClick={() => setViewMode('grid')}><GridViewIcon /></ViewButton>
             <ViewButton active={viewMode === 'detailed'} label="Detailed view" onClick={() => setViewMode('detailed')}><DetailedViewIcon /></ViewButton>
-            <ViewButton active={viewMode === 'compact'} label="Compact list view" onClick={() => setViewMode('compact')}><CompactViewIcon /></ViewButton>
+            <span className="hidden sm:block">
+              <ViewButton active={viewMode === 'compact'} label="Compact list view" onClick={() => setViewMode('compact')}><CompactViewIcon /></ViewButton>
+            </span>
           </div>
         </div>
       </div>
@@ -73,7 +90,7 @@ export default function MovieListTab({ items, onEdit }: MovieListTabProps) {
 function DetailedMovieRow({ item, onEdit }: { item: MovieListItem; onEdit: (item: MovieListItem) => void }) {
   const { movie, rating, status } = item
   return (
-    <article className="flex gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-3 transition hover:border-zinc-700 hover:bg-zinc-900">
+    <article className="flex gap-3 rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5 transition hover:border-zinc-700 hover:bg-zinc-900 sm:gap-4 sm:rounded-2xl sm:p-3">
       <Link className="relative h-28 w-20 shrink-0 overflow-hidden rounded-xl bg-zinc-950" href={`/movies/${movie.id}`}>
         {movie.poster_url ? <Image alt={`${movie.title} poster`} className="object-cover" fill sizes="80px" src={movie.poster_url} /> : null}
       </Link>

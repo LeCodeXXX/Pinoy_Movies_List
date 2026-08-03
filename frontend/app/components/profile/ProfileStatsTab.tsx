@@ -25,15 +25,15 @@ export default function ProfileStatsTab({
   const genreColors = ['#60a5fa', '#34d399', '#fbbf24', '#a78bfa']
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Score Distribution Chart */}
-      <div className="rounded-3xl border border-zinc-800/80 bg-zinc-900/60 p-6 backdrop-blur-md space-y-4">
+      <div className="space-y-4 rounded-xl border border-zinc-800/80 bg-zinc-900/60 p-4 backdrop-blur-md sm:rounded-3xl sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-300">
             Score Distribution (1-10)
           </h2>
           <div className="text-right">
-            <p className="text-3xl font-black">
+            <p className="text-2xl font-black sm:text-3xl">
               {meanScore ? meanScore.toFixed(1) : 'N/A'}
               {meanScore ? <span className="text-xs text-zinc-500"> / 10</span> : null}
             </p>
@@ -61,7 +61,7 @@ export default function ProfileStatsTab({
       </div>
 
       {/* Favorite Genres Breakdown */}
-      <div className="space-y-5 rounded-3xl border border-zinc-800/80 bg-zinc-900/60 p-6 backdrop-blur-md">
+      <div className="space-y-5 rounded-xl border border-zinc-800/80 bg-zinc-900/60 p-4 backdrop-blur-md sm:rounded-3xl sm:p-6">
         <div className="flex flex-wrap items-end justify-between gap-3 border-b border-zinc-800 pb-4">
           <div>
             <h2 className="text-sm font-bold uppercase tracking-wider text-zinc-300">
@@ -83,11 +83,11 @@ export default function ProfileStatsTab({
             return (
               <article
                 key={name}
-                className="flex items-center gap-4 rounded-2xl border border-zinc-800 bg-zinc-950/80 p-4 transition hover:border-zinc-700"
+                className="flex items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-950/80 p-3 transition hover:border-zinc-700 sm:gap-4 sm:rounded-2xl sm:p-4"
               >
                 <span
                   aria-hidden="true"
-                  className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border bg-zinc-900 text-2xl"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border bg-zinc-900 text-xl sm:h-12 sm:w-12 sm:rounded-2xl sm:text-2xl"
                   style={{ borderColor: `${color}55` }}
                 >
                   {getGenreIcon(name)}

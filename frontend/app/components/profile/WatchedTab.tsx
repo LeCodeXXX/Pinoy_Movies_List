@@ -10,11 +10,11 @@ interface WatchedTabProps {
 export default function WatchedTab({ movies }: WatchedTabProps) {
   if (movies.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-zinc-800 bg-zinc-950/40 p-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950/40 p-6 text-center sm:rounded-3xl sm:p-12">
         <div className="flex h-14 w-14 items-center justify-center rounded-full border border-red-500/20 bg-red-950/20 text-red-400">
           <EyeIcon />
         </div>
-        <h3 className="mt-4 text-lg font-bold text-white">No Watched History</h3>
+        <h3 className="mt-4 text-base font-bold text-white sm:text-lg">No Watched History</h3>
         <p className="mt-1.5 max-w-sm text-xs text-zinc-400">
           Keep track of Filipino movies you have watched over time.
         </p>
@@ -24,7 +24,7 @@ export default function WatchedTab({ movies }: WatchedTabProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-bold text-white">
+      <h2 className="text-base font-bold text-white sm:text-lg">
         Watched History ({movies.length})
       </h2>
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">

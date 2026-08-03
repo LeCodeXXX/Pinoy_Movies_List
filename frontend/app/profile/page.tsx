@@ -42,6 +42,7 @@ export default function UserProfile() {
     useState<ListCategoryFilter>('all')
   const [selectedGenre, setSelectedGenre] = useState('all')
   const [selectedYear, setSelectedYear] = useState('all')
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false)
 
   const [movieListItems, setMovieListItems] = useState<MovieListItem[]>([])
   const [userReviews, setUserReviews] = useState<MovieReview[]>([])
@@ -242,8 +243,8 @@ export default function UserProfile() {
   if (!user) {
     return (
       <div className="min-h-screen bg-zinc-950 px-4 py-16 text-zinc-100 selection:bg-red-500 selection:text-white">
-        <div className="mx-auto max-w-lg rounded-3xl border border-zinc-800 bg-zinc-900/60 p-8 text-center shadow-2xl backdrop-blur-md">
-          <h1 className="text-2xl font-extrabold text-white">
+        <div className="mx-auto max-w-lg rounded-xl border border-zinc-800 bg-zinc-900/60 p-5 text-center shadow-2xl backdrop-blur-md sm:rounded-3xl sm:p-8">
+          <h1 className="text-xl font-extrabold text-white sm:text-2xl">
             Sign In Required
           </h1>
           <p className="mt-2 text-xs text-zinc-400">
@@ -289,8 +290,20 @@ export default function UserProfile() {
       <ProfileNavBar activeTab={activeTab} onTabChange={setActiveTab} />
 
       {/* Main 2-Column Content Container */}
-      <main className="mx-auto max-w-[1280px] px-6 py-8 sm:px-8 lg:px-12">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-start">
+      <main className="mx-auto max-w-[1280px] px-3 py-5 sm:px-8 sm:py-8 lg:px-12">
+        {activeTab === 'movielist' && (
+          <div className="mb-4 flex justify-end lg:hidden">
+            <button
+              className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs font-bold text-zinc-300 transition hover:border-zinc-700 hover:text-white"
+              onClick={() => setIsFiltersOpen(true)}
+              type="button"
+            >
+              <FilterIcon />
+              Filters
+            </button>
+          </div>
+        )}
+        <div className="flex flex-col gap-6 lg:flex-row lg:gap-8 lg:items-start">
           {/* Movie-list filters are only relevant to the Movie List tab. */}
           {activeTab === 'movielist' && (
             <ProfileSidebar
@@ -301,6 +314,8 @@ export default function UserProfile() {
               onGenreChange={setSelectedGenre}
               onQueryChange={setFilterQuery}
               onYearChange={setSelectedYear}
+              isMobileOpen={isFiltersOpen}
+              onClose={() => setIsFiltersOpen(false)}
               selectedCategory={selectedCategory}
               selectedGenre={selectedGenre}
               selectedYear={selectedYear}
@@ -334,18 +349,18 @@ export default function UserProfile() {
             {activeTab === 'reviews' && <ReviewsTab reviews={userReviews} />}
 
             {activeTab === 'settings' && (
-              <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-6 sm:p-8 space-y-4">
-                <h2 className="text-lg font-bold text-white">Account Settings</h2>
+              <div className="space-y-4 rounded-xl border border-zinc-800 bg-zinc-900/40 p-4 sm:rounded-3xl sm:p-8">
+                <h2 className="text-base font-bold text-white sm:text-lg">Account Settings</h2>
                 <p className="text-xs text-zinc-400">
                   Update your display name or avatar image URL.
                 </p>
 
                 <div className="space-y-3 max-w-md">
-                  <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                  <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3 sm:rounded-2xl sm:p-4">
                     <p className="text-xs text-zinc-500">Username</p>
                     <p className="text-sm font-bold text-white">@{user.username}</p>
                   </div>
-                  <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-4">
+                  <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3 sm:rounded-2xl sm:p-4">
                     <p className="text-xs text-zinc-500">Email Address</p>
                     <p className="text-sm font-bold text-white">{user.email}</p>
                   </div>
@@ -383,5 +398,13 @@ export default function UserProfile() {
         />
       ) : null}
     </div>
+  )
+}
+
+function FilterIcon() {
+  return (
+    <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path d="M4 6h16M7 12h10M10 18h4" strokeLinecap="round" strokeWidth={1.8} />
+    </svg>
   )
 }

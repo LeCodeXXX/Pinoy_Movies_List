@@ -29,7 +29,7 @@ export default function ProfileNavBar({
       <div className="mx-auto max-w-[1600px] px-4 sm:px-6 lg:px-8">
         <nav
           aria-label="Profile navigation"
-          className="flex gap-6 overflow-x-auto scrollbar-none sm:justify-center"
+          className="flex min-w-full justify-center gap-4 overflow-x-auto scrollbar-none sm:gap-6"
         >
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id
@@ -37,7 +37,7 @@ export default function ProfileNavBar({
               <button
                 key={tab.id}
                 aria-selected={isActive}
-                className={`relative py-3.5 text-sm font-bold transition duration-200 ${isActive
+                className={`relative py-3 text-xs font-bold transition duration-200 sm:py-3.5 sm:text-sm ${isActive
                   ? 'text-white'
                   : 'text-zinc-400 hover:text-zinc-200'
                   }`}

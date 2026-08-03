@@ -16,11 +16,11 @@ interface RatingsTabProps {
 export default function RatingsTab({ ratings }: RatingsTabProps) {
   if (ratings.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-zinc-800 bg-zinc-950/40 p-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950/40 p-6 text-center sm:rounded-3xl sm:p-12">
         <div className="flex h-14 w-14 items-center justify-center rounded-full border border-red-500/20 bg-red-950/20 text-red-400">
           <StarIcon />
         </div>
-        <h3 className="mt-4 text-lg font-bold text-white">No Ratings Submitted</h3>
+        <h3 className="mt-4 text-base font-bold text-white sm:text-lg">No Ratings Submitted</h3>
         <p className="mt-1.5 max-w-sm text-xs text-zinc-400">
           Rate movies from 1 to 10 to share your score with the Pinoy Cinema community.
         </p>
@@ -30,7 +30,7 @@ export default function RatingsTab({ ratings }: RatingsTabProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-bold text-white">
+      <h2 className="text-base font-bold text-white sm:text-lg">
         My Ratings ({ratings.length})
       </h2>
 
@@ -38,7 +38,7 @@ export default function RatingsTab({ ratings }: RatingsTabProps) {
         {ratings.map(({ movie, rated_at, rating }) => (
           <Link
             key={movie.id}
-            className="flex gap-4 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-3 transition hover:border-zinc-700 hover:bg-zinc-900"
+            className="flex gap-3 rounded-lg border border-zinc-800 bg-zinc-900/60 p-2.5 transition hover:border-zinc-700 hover:bg-zinc-900 sm:gap-4 sm:rounded-2xl sm:p-3"
             href={`/movies/${movie.id}`}
           >
             <img

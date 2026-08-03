@@ -65,13 +65,13 @@ export default function EditProfileModal({
       <div
         aria-labelledby="edit-profile-title"
         aria-modal="true"
-        className="w-full max-w-md rounded-3xl border border-zinc-800 bg-zinc-900 p-6 shadow-2xl shadow-black sm:p-7"
+        className="w-full max-w-md rounded-xl border border-zinc-800 bg-zinc-900 p-4 shadow-2xl shadow-black sm:rounded-3xl sm:p-7"
         role="dialog"
       >
         <div className="flex items-start justify-between gap-4 border-b border-zinc-800/80 pb-4">
           <div>
             <h2
-              className="mt-1 text-2xl font-extrabold text-white"
+              className="mt-1 text-xl font-extrabold text-white sm:text-2xl"
               id="edit-profile-title"
             >
               Edit Profile

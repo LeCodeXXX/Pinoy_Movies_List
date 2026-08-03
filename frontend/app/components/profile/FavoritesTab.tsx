@@ -14,11 +14,11 @@ export default function FavoritesTab({
 }: FavoritesTabProps) {
   if (movies.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-zinc-800 bg-zinc-950/40 p-12 text-center">
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-zinc-800 bg-zinc-950/40 p-6 text-center sm:rounded-3xl sm:p-12">
         <div className="flex h-14 w-14 items-center justify-center rounded-full border border-red-500/20 bg-red-950/20 text-red-400">
           <HeartOutlineIcon />
         </div>
-        <h3 className="mt-4 text-lg font-bold text-white">No Favorite Movies Yet</h3>
+        <h3 className="mt-4 text-base font-bold text-white sm:text-lg">No Favorite Movies Yet</h3>
         <p className="mt-1.5 max-w-sm text-xs text-zinc-400">
           Explore Pinoy cinema and click the heart icon on any movie to build your personal vault.
         </p>
@@ -29,7 +29,7 @@ export default function FavoritesTab({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-white">
+        <h2 className="text-base font-bold text-white sm:text-lg">
           Favorited Movies ({movies.length})
         </h2>
       </div>

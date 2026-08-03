@@ -10,6 +10,8 @@ interface ProfileSidebarProps {
   onGenreChange: (genre: string) => void
   onQueryChange: (query: string) => void
   onYearChange: (year: string) => void
+  isMobileOpen: boolean
+  onClose: () => void
   selectedCategory: ListCategoryFilter
   selectedGenre: string
   selectedYear: string
@@ -29,6 +31,8 @@ export default function ProfileSidebar({
   onGenreChange,
   onQueryChange,
   onYearChange,
+  isMobileOpen,
+  onClose,
   selectedCategory,
   selectedGenre,
   selectedYear,
@@ -42,7 +46,27 @@ export default function ProfileSidebar({
   ]
 
   return (
-    <aside className="w-full space-y-6 lg:w-64 shrink-0">
+    <>
+      {isMobileOpen ? (
+        <div
+          className="fixed inset-0 z-50 bg-black/70 p-3 backdrop-blur-sm lg:hidden"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) onClose()
+          }}
+        />
+      ) : null}
+      <aside className={`${isMobileOpen ? 'fixed inset-x-3 top-1/2 z-[60] max-h-[calc(100vh-1.5rem)] -translate-y-1/2 overflow-y-auto rounded-xl border border-zinc-800 bg-zinc-950 p-4 shadow-2xl' : 'hidden'} space-y-6 shrink-0 lg:static lg:inset-auto lg:top-auto lg:block lg:w-64 lg:translate-y-0 lg:overflow-visible lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none`}>
+        <div className="mb-1 flex items-center justify-between lg:hidden">
+          <h2 className="text-sm font-bold text-white">Filter Movies</h2>
+          <button
+            aria-label="Close filters"
+            className="rounded-lg p-1.5 text-zinc-500 transition hover:bg-zinc-800 hover:text-white"
+            onClick={onClose}
+            type="button"
+          >
+            <CloseIcon />
+          </button>
+        </div>
       {/* Search Filter Box */}
       <div className="relative">
         <span aria-hidden="true" className="absolute inset-y-0 left-0 flex items-center pl-3 text-zinc-500">
@@ -141,7 +165,16 @@ export default function ProfileSidebar({
           </div>
         </div>
       </div>
-    </aside>
+      </aside>
+    </>
+  )
+}
+
+function CloseIcon() {
+  return (
+    <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path d="M6 6l12 12M18 6L6 18" strokeLinecap="round" strokeWidth={1.8} />
+    </svg>
   )
 }
 
