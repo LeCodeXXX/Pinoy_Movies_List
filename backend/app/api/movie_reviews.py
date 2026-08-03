@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Path
+from fastapi import APIRouter, Path, Request
 
 from app.schemas.movie_review import (
     MovieReviewListResponse,
@@ -10,6 +10,7 @@ from app.schemas.movie_review import (
     MovieReviewUpsertRequest,
 )
 from app.controllers import movie_review_controller
+from app.middleware.jwt_auth import require_same_user
 
 router = APIRouter(tags=["movie reviews"])
 
@@ -44,8 +45,10 @@ async def get_user_movie_review(
     response_model=MovieReviewResponse,
 )
 async def upsert_user_movie_review(
+    request: Request,
     user_id: Annotated[str, Path(min_length=1)],
     movie_id: Annotated[int, Path(ge=1)],
     data: MovieReviewUpsertRequest,
 ) -> MovieReviewResponse:
+    require_same_user(user_id, request)
     return await movie_review_controller.upsert(user_id, movie_id, data)

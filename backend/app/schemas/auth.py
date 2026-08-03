@@ -42,6 +42,8 @@ class UserResponse(BaseModel):
 class AuthResponse(BaseModel):
     message: str
     user: UserResponse
+    access_token: str
+    token_type: str = "bearer"
 
 
 class UpdateProfileRequest(BaseModel):
@@ -52,4 +54,3 @@ class UpdateProfileRequest(BaseModel):
     @classmethod
     def strip_text(cls, value: object) -> object:
         return value.strip() if isinstance(value, str) else value
-

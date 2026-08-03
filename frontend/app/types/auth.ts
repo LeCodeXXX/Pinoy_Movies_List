@@ -13,6 +13,8 @@ export interface AuthUser {
 export interface AuthResponse {
   message: string
   user: AuthUser
+  access_token: string
+  token_type: string
 }
 
 export interface LoginInput {

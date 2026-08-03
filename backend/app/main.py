@@ -11,6 +11,8 @@ from app.api.movie_reviews import router as movie_reviews_router
 from app.api.movies import router as movies_router
 from app.core.database import database
 from app.core.exceptions import ApplicationError
+from app.middleware.rate_limiter import RateLimitMiddleware
+from app.middleware.jwt_auth import JWTAuthenticationMiddleware
 from app.services.tmdb_client import tmdb_client
 
 
@@ -27,9 +29,11 @@ async def lifespan(_: FastAPI):
 app = FastAPI(title="Pinoy Movies List API", lifespan=lifespan)
 
 # CORS configuration (change as the project grows)
+app.add_middleware(RateLimitMiddleware)
+app.add_middleware(JWTAuthenticationMiddleware)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

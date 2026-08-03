@@ -3,6 +3,7 @@ import { useEffect, useState, type FormEvent } from 'react'
 import { createPortal } from 'react-dom'
 import { login, signup } from '../services/authApi'
 import type { AuthUser } from '../types/auth'
+import { AUTH_TOKEN_STORAGE_KEY } from '../utils/api'
 
 type AuthMode = 'login' | 'signup'
 
@@ -19,7 +20,12 @@ export default function AuthMenu() {
 
   useEffect(() => {
     const storedUser = window.localStorage.getItem(AUTH_USER_STORAGE_KEY)
-    if (!storedUser) return
+    const storedToken = window.localStorage.getItem(AUTH_TOKEN_STORAGE_KEY)
+    if (!storedUser || !storedToken) {
+      window.localStorage.removeItem(AUTH_USER_STORAGE_KEY)
+      window.localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY)
+      return
+    }
 
     try {
       const parsedUser: unknown = JSON.parse(storedUser)
@@ -53,6 +59,7 @@ export default function AuthMenu() {
 
   const logout = () => {
     window.localStorage.removeItem(AUTH_USER_STORAGE_KEY)
+    window.localStorage.removeItem(AUTH_TOKEN_STORAGE_KEY)
     setUser(null)
   }
 
@@ -84,6 +91,10 @@ export default function AuthMenu() {
       window.localStorage.setItem(
         AUTH_USER_STORAGE_KEY,
         JSON.stringify(response.user),
+      )
+      window.localStorage.setItem(
+        AUTH_TOKEN_STORAGE_KEY,
+        response.access_token,
       )
       setUser(response.user)
       setIsOpen(false)

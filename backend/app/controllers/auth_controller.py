@@ -9,6 +9,7 @@ from app.schemas.auth import (
     UserResponse,
 )
 from app.services.auth_service import auth_service
+from app.middleware.jwt_auth import create_access_token
 
 
 def build_user_response(user: User) -> UserResponse:
@@ -24,14 +25,22 @@ def build_user_response(user: User) -> UserResponse:
     )
 
 
+def build_auth_response(message: str, user: User) -> AuthResponse:
+    return AuthResponse(
+        message=message,
+        user=build_user_response(user),
+        access_token=create_access_token(str(user.id)),
+    )
+
+
 async def signup(data: SignupRequest) -> AuthResponse:
     user = await auth_service.signup(data)
-    return AuthResponse(message="Account created successfully", user=build_user_response(user))
+    return build_auth_response("Account created successfully", user)
 
 
 async def login(data: LoginRequest) -> AuthResponse:
     user = await auth_service.login(data)
-    return AuthResponse(message="Login successful", user=build_user_response(user))
+    return build_auth_response("Login successful", user)
 
 
 async def update_profile(user_id: str, data: UpdateProfileRequest) -> AuthResponse:
@@ -40,4 +49,4 @@ async def update_profile(user_id: str, data: UpdateProfileRequest) -> AuthRespon
         display_name=data.display_name,
         profile_picture=data.profile_picture,
     )
-    return AuthResponse(message="Profile updated successfully", user=build_user_response(user))
+    return build_auth_response("Profile updated successfully", user)
