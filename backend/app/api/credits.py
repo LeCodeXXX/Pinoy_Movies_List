@@ -1,16 +1,20 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Path, Query
+from fastapi import APIRouter, Path, Query, Request, Response
 
 from app.core.config import settings
 from app.schemas.credit import CreditMoviesResponse
 from app.controllers import credit_controller
+from app.middleware.rate_limiter import catalog_limit
 
 router = APIRouter(tags=["credits"])
 
 
 @router.get("/people/{person_id}", response_model=CreditMoviesResponse)
+@catalog_limit
 async def get_person_movies(
+    request: Request,
+    response: Response,
     person_id: Annotated[int, Path(ge=1)],
     page: Annotated[int, Query(ge=1, le=500)] = 1,
     page_size: Annotated[int, Query(ge=1, le=12)] = 12,
@@ -20,7 +24,10 @@ async def get_person_movies(
 
 
 @router.get("/companies/{company_id}", response_model=CreditMoviesResponse)
+@catalog_limit
 async def get_company_movies(
+    request: Request,
+    response: Response,
     company_id: Annotated[int, Path(ge=1)],
     page: Annotated[int, Query(ge=1, le=500)] = 1,
     page_size: Annotated[int, Query(ge=1, le=12)] = 12,

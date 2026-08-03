@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Path, Request
+from fastapi import APIRouter, Path, Request, Response
 
 from app.schemas.movie_preference import (
     MoviePreferenceListResponse,
@@ -11,13 +11,16 @@ from app.schemas.movie_preference import (
 )
 from app.controllers import movie_preference_controller
 from app.middleware.jwt_auth import require_same_user
+from app.middleware.rate_limiter import user_data_limit, write_limit
 
 router = APIRouter(prefix="/users/{user_id}/movie-preferences", tags=["movie preferences"])
 
 
 @router.get("", response_model=MoviePreferenceListResponse)
+@user_data_limit
 async def list_movie_preferences(
     request: Request,
+    response: Response,
     user_id: Annotated[str, Path(min_length=1)],
 ) -> MoviePreferenceListResponse:
     require_same_user(user_id, request)
@@ -25,8 +28,10 @@ async def list_movie_preferences(
 
 
 @router.get("/{movie_id}", response_model=MoviePreferenceResponse)
+@user_data_limit
 async def get_movie_preference(
     request: Request,
+    response: Response,
     user_id: Annotated[str, Path(min_length=1)],
     movie_id: Annotated[int, Path(ge=1)],
 ) -> MoviePreferenceResponse:
@@ -35,8 +40,10 @@ async def get_movie_preference(
 
 
 @router.put("/{movie_id}", response_model=MoviePreferenceResponse)
+@write_limit
 async def upsert_movie_preference(
     request: Request,
+    response: Response,
     user_id: Annotated[str, Path(min_length=1)],
     movie_id: Annotated[int, Path(ge=1)],
     data: MoviePreferenceUpsertRequest,
