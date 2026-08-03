@@ -64,7 +64,7 @@ export default function CreditProfilePage({ kind }: { kind: 'person' | 'company'
           </div>
           <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-red-400">{profile.role ?? (kind === 'person' ? 'Film profile' : 'Production company')}</p>
           <h1 className="mt-2 text-3xl font-black text-white sm:text-5xl">{profile.name}</h1>
-          {profile.description ? <p className="mx-auto mt-3 max-w-3xl text-sm leading-7 text-zinc-400">{profile.description}</p> : null}
+          {profile.description ? <p className="mx-auto mt-3 max-w-3xl text-xs leading-6 text-zinc-400 sm:text-sm sm:leading-7">{profile.description}</p> : null}
         </section>
 
         <section className="mt-8 pb-12">
