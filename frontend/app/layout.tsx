@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Pinoy Movies List",
-  description: "Discover Filipino films and track your favorites and ratings.",
+  title: "Pinoy Cinema Vault",
+  description: "Your ultimate sanctuary forFilipino films. Discover, rate, and keep track of your cinematic journey with ease.",
 };
 
 export default function RootLayout({
